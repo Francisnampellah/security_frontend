@@ -33,9 +33,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const login = async (email: string, password: string) => {
+
     const { token, user } = await AuthService.login(email, password);
     localStorage.setItem('token', token);
     setUser(user);
+    
   };
 
   const logout = () => {
