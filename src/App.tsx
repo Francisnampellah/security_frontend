@@ -1,31 +1,45 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import React from 'react'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Dashboard from './components/pages/Dashboard';
+import UserManagement from './components/pages/UserManagement';
+import Inventory from '../src/components/pages/inventory';
 import './App.css'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import LoginForm from './components/auth/LoginForm';
-import Dashboard from './components/pages/Dashboard';
 import { Register } from './components/auth/Register';
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 60 * 1000, // 1 minute
+    },
+  },
+})
+
+
 
 function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
-        <Routes>
-          <Route path="/login" element={<LoginForm />} />
+    <QueryClientProvider client={queryClient}>
+      <Router>
+        <AuthProvider>
+          <Routes>
+            <Route path="/login" element={<LoginForm />} />
           <Route path="/register" element={<Register />} />
 
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<Dashboard />} />
-            {/* Add other protected routes here */}
+            <Route path="/dashboard/users" element={<UserManagement />} />
+            <Route path="/dashboard/inventory" element={<Inventory />} />
           </Route>
           
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/" element={<ProtectedRoute />} />
         </Routes>
       </AuthProvider>
-    </BrowserRouter>
+      </Router>
+    </QueryClientProvider>
   );
 }
 
