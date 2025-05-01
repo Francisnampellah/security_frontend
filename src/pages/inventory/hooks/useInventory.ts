@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { Medicine } from "../../../type"
 import { fetchMedicines, deleteMedicine, addMedicine, updateStock, bulkUploadMedicines } from "../../../services/inventory"
+import { bulkUpdateStock } from "../../../services/inventory/stockService"
 
 export function useInventory() {
 
@@ -55,6 +56,22 @@ export function useInventory() {
   // Update stock mutation
   const updateStockMutation = useMutation({
     mutationFn: updateStock,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['medicines'] })
+      toast.success("Stock updated", {
+        description: "The stock has been successfully updated.",
+      })
+    },
+    onError: (error) => {
+      toast.error("Failed to update stock", {
+        description: error.message,
+      })
+    },
+  })
+
+  // Bulk update stock mutation
+  const bulkUpdateStockMutation = useMutation({
+    mutationFn: bulkUpdateStock,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['medicines'] })
       toast.success("Stock updated", {
@@ -131,6 +148,7 @@ export function useInventory() {
     setFilteredMedicines: setSearchTerm,
     setSearchTerm,
     addDialogOpen,
+    bulkUpdateStockMutation,
     setAddDialogOpen,
     updateStockDialogOpen,
     setUpdateStockDialogOpen,

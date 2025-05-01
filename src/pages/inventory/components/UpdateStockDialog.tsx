@@ -16,9 +16,14 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { UpdateStockSchema } from "../schema"
 import { useInventory } from "../hooks/useInventory"
 import { Medicine } from "../../../type"
+import { useState } from "react"
+import { Download, Upload } from "lucide-react"
+import { getStockUpdateTemplate } from "../../../services/inventory/stockService"
+// import { useToast } from "@/components/ui/use-toast"
 
 interface UpdateStockDialogProps {
   open: boolean
@@ -27,9 +32,9 @@ interface UpdateStockDialogProps {
 }
 
 export function UpdateStockDialog({ open, onOpenChange, medicine }: UpdateStockDialogProps) {
-  if (!medicine) return null
-
-  const { handleUpdateStock } = useInventory()
+  const { handleUpdateStock, bulkUpdateStockMutation } = useInventory()
+  // const { toast } = useToast()
+  const [file, setFile] = useState<File | null>(null)
 
   const form = useForm<z.infer<typeof UpdateStockSchema>>({
     resolver: zodResolver(UpdateStockSchema),
@@ -39,14 +44,9 @@ export function UpdateStockDialog({ open, onOpenChange, medicine }: UpdateStockD
   })
 
   function handleSubmit(values: z.infer<typeof UpdateStockSchema>) {
-    console.log("submitted")
+    if (!medicine) return
 
     const quantity = Number.parseInt(values.quantity)
-
-    console.log({
-      medicineId: medicine.id,
-      quantity,
-    })
 
     handleUpdateStock({
       medicineId: medicine.id,
@@ -57,42 +57,156 @@ export function UpdateStockDialog({ open, onOpenChange, medicine }: UpdateStockD
     onOpenChange(false)
   }
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0]
+    if (selectedFile) {
+      setFile(selectedFile)
+    }
+  }
+
+  const handleBulkSubmit = async () => {
+    if (!file) {
+      console.log("no file")
+
+      return
+    }
+
+    try {
+      await bulkUpdateStockMutation.mutateAsync(file)
+      setFile(null)
+      onOpenChange(false)
+    } catch (error) {
+      // toast({
+      //   title: "Error",
+      //   description: "Failed to update stock. Please check your file format.",
+      //   variant: "destructive",
+      // })
+      console.log(error)
+    }
+  }
+
+  const handleDownloadTemplate = async () => {
+    try {
+      const blob = await getStockUpdateTemplate();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'stock_update_template.xlsx';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error('Error downloading template:', error);
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>Update Stock - {medicine.name}</DialogTitle>
+          <DialogTitle>Update Stock</DialogTitle>
           <DialogDescription>
-            Update the stock quantity for this medicine. Current stock: {medicine.stock?.quantity || 0} units
+            {medicine ? `Update stock for ${medicine.name}. Current stock: ${medicine.stock?.quantity || 0} units` : "Update stock in bulk"}
           </DialogDescription>
         </DialogHeader>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+        
+        <Tabs defaultValue={medicine ? "single" : "bulk"} className="w-full" onValueChange={() => form.reset()}>
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="single" disabled={!medicine}>Single Update</TabsTrigger>
+            <TabsTrigger value="bulk">Bulk Update</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="single" className="mt-4">
+            {medicine && (
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="quantity"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Quantity</FormLabel>
+                        <FormControl>
+                          <Input type="number" min="0" placeholder="0" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
+                  <DialogFooter>
+                    <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                      Cancel
+                    </Button>
+                    <Button type="submit">Update Stock</Button>
+                  </DialogFooter>
+                </form>
+              </Form>
+            )}
+          </TabsContent>
 
-            <FormField
-              control={form.control}
-              name="quantity"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Quantity</FormLabel>
-                  <FormControl>
-                    <Input type="number" min="0" placeholder="0" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <TabsContent value="bulk" className="mt-4">
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleDownloadTemplate}
+                  className="flex items-center gap-2"
+                >
+                  <Download className="h-4 w-4" />
+                  Download Template
+                </Button>
+              </div>
 
+              <Form {...form}>
+                <div className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="file"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Upload Excel File</FormLabel>
+                        <FormControl>
+                          <div className="flex flex-col gap-4">
+                            <Input
+                              type="file"
+                              accept=".xlsx"
+                              onChange={handleFileChange}
+                              className="w-full"
+                            />
+                            {file && (
+                              <p className="text-sm text-muted-foreground">
+                                Selected file: {file.name}
+                              </p>
+                            )}
+                            <Button
+                              type="button"
+                              onClick={handleBulkSubmit}
+                              disabled={!file}
+                              className="flex items-center gap-2 self-end"
+                            >
+                              <Upload className="h-4 w-4" />
+                              Upload
+                            </Button>
+                          </div>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </Form>
 
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                Cancel
-              </Button>
-              <Button type="submit">Update Stock</Button>
-            </DialogFooter>
-          </form>
-        </Form>
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                  Cancel
+                </Button>
+              </DialogFooter>
+            </div>
+          </TabsContent>
+        </Tabs>
       </DialogContent>
     </Dialog>
   )
