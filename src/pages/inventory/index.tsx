@@ -58,37 +58,37 @@ export default function InventoryPage() {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <Input
-              placeholder="Search medicines..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+          <Input
+            placeholder="Search medicines..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
               className="w-[300px]"
-            />
+          />
             <Button variant="outline" size="icon">
-              <Search className="h-4 w-4" />
-            </Button>
-          </div>
+            <Search className="h-4 w-4" />
+          </Button>
+        </div>
           <Button onClick={handleAddMedicine}>
             <Plus className="h-4 w-4 mr-2" />
             Add Medicine
           </Button>
         </div>
 
-        <InventoryTable
-          medicines={medicines}
-          isLoading={isLoading}
-          onDelete={handleDelete}
-          onUpdateStock={openUpdateStockDialog}
+          <InventoryTable
+            medicines={medicines}
+            isLoading={isLoading}
+            onDelete={handleDelete}
+            onUpdateStock={openUpdateStockDialog}
           onView={(medicine) => {
             setSelectedMedicine(medicine)
             setViewDialogOpen(true)
           }}
           onEdit={handleEditMedicine}
-          isDeleting={isDeleting}
-          deletingId={deletingId}
-        />
+            isDeleting={isDeleting}
+            deletingId={deletingId}
+          />
 
-        <AddMedicineDialog
+      <AddMedicineDialog
           open={addDialogOpen}
           onOpenChange={(open) => {
             setAddDialogOpen(open)
@@ -96,20 +96,20 @@ export default function InventoryPage() {
           }}
           medicine={editingMedicine}
           onSubmit={() => setEditingMedicine(null)}
-        />
+      />
 
-        <UpdateStockDialog
-          open={updateStockDialogOpen}
-          onOpenChange={setUpdateStockDialogOpen}
-          medicine={selectedMedicine}
-        />
+      <UpdateStockDialog
+        open={updateStockDialogOpen}
+        onOpenChange={setUpdateStockDialogOpen}
+        medicine={selectedMedicine}
+      />
 
         <ViewMedicineDialog
           open={viewDialogOpen}
           onOpenChange={setViewDialogOpen}
           medicine={selectedMedicine}
         />
-      </div>
+    </div>
     </DashboardLayout>
   )
 } 
