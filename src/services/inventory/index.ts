@@ -20,7 +20,7 @@ export const updateStock = async ({ medicineId, quantity }: any): Promise<Medici
     quantity,
   })
   return response.data
-} 
+}
 
 export const getMedicineTemplate = async (): Promise<Blob> => {
   const response = await axiosInstance.get('/excel/medicine', {
@@ -37,4 +37,9 @@ export const bulkUploadMedicines = async (file: File): Promise<void> => {
       'Content-Type': 'multipart/form-data',
     },
   });
+}
+
+export const updateMedicine = async (id: number, medicine: any): Promise<Medicine> => {
+  const response = await axiosInstance.put<Medicine>(`/medicine/${id}`, medicine)
+  return response.data
 }

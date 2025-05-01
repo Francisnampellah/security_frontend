@@ -20,14 +20,22 @@ import { useInventory } from "../hooks/useInventory"
 import { useSupport } from "../hooks/useSupport"
 import { bulkUploadMedicines, getMedicineTemplate } from "@/services/inventory"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { Medicine } from "../../../type"
 
-export function AddMedicineDialog({ open, onOpenChange, onSubmit }: any) {
+interface AddMedicineDialogProps {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  onSubmit?: (values: any) => void
+  medicine?: Medicine | null
+}
+
+export function AddMedicineDialog({ open, onOpenChange, onSubmit, medicine }: AddMedicineDialogProps) {
   const { manufacturers, categories, units, addManufacturerMutation, addCategoryMutation, addUnitMutation } = useSupport()
   const queryClient = useQueryClient();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const { addMutation, bulkUploadMutation } = useInventory()
+  const { addMutation, updateMutation, bulkUploadMutation } = useInventory()
   const form = useForm<z.infer<typeof MedicineFormSchema>>({
     resolver: zodResolver(MedicineFormSchema),
     defaultValues: {
@@ -40,6 +48,31 @@ export function AddMedicineDialog({ open, onOpenChange, onSubmit }: any) {
       dosage: "",
     },
   })
+
+  // Set form values when editing an existing medicine
+  useEffect(() => {
+    if (medicine) {
+      form.reset({
+        name: medicine.name,
+        manufacturer: medicine.manufacturer.id.toString(),
+        unit: medicine.unit.id.toString(),
+        category: medicine.category.id.toString(),
+        sellPrice: medicine.sellPrice.toString(),
+        quantity: medicine.stock?.quantity.toString() || "0",
+        dosage: medicine.dosage || "",
+      })
+    } else {
+      form.reset({
+        name: "",
+        manufacturer: "",
+        unit: "",
+        category: "",
+        sellPrice: "",
+        quantity: "0",
+        dosage: "",
+      })
+    }
+  }, [medicine, form])
 
   // Convert data to format required by react-select
   const manufacturerOptions = manufacturers.map((m) => ({ value: m.id.toString(), label: m.name }))
@@ -91,19 +124,29 @@ export function AddMedicineDialog({ open, onOpenChange, onSubmit }: any) {
       sellPrice: typeof values.sellPrice === "string" ? Number.parseFloat(values.sellPrice) : values.sellPrice,
     }
 
-    addMutation.mutate(formattedValues, {
-      onSuccess: () => {
-        form.reset()
-        onOpenChange(false)
-      },
-      onError: (error) => {
-        console.error("Error adding medicine:", error)
-      },
-    })
+    if (medicine) {
+      updateMutation.mutate({ id: medicine.id, medicine: formattedValues }, {
+        onSuccess: () => {
+          form.reset()
+          onOpenChange(false)
+        },
+        onError: (error) => {
+          console.error("Error updating medicine:", error)
+        },
+      })
+    } else {
+      addMutation.mutate(formattedValues, {
+        onSuccess: () => {
+          form.reset()
+          onOpenChange(false)
+        },
+        onError: (error) => {
+          console.error("Error adding medicine:", error)
+        },
+      })
+    }
 
     onSubmit?.(formattedValues)
-    form.reset()
-    onOpenChange(false)
   }
 
   // Custom styles for react-select to match shadcn UI
@@ -166,14 +209,14 @@ export function AddMedicineDialog({ open, onOpenChange, onSubmit }: any) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Add New Medicine</DialogTitle>
-          <DialogDescription>Choose how you want to add medicines.</DialogDescription>
+          <DialogTitle>{medicine ? "Update Medicine" : "Add New Medicine"}</DialogTitle>
+          <DialogDescription>{medicine ? "Update the medicine details." : "Choose how you want to add medicines."}</DialogDescription>
         </DialogHeader>
         
-        <Tabs defaultValue="single" className="w-full">
+        <Tabs defaultValue={medicine ? "single" : "bulk"} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="single">Single Item</TabsTrigger>
-            <TabsTrigger value="bulk">Bulk Upload</TabsTrigger>
+            <TabsTrigger value="bulk" disabled={!!medicine}>Bulk Upload</TabsTrigger>
           </TabsList>
           
           <TabsContent value="single" className="min-h-[400px]">
@@ -322,7 +365,7 @@ export function AddMedicineDialog({ open, onOpenChange, onSubmit }: any) {
                   <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                     Cancel
                   </Button>
-                  <Button type="submit">Save Medicine</Button>
+                  <Button type="submit">{medicine ? "Update Medicine" : "Save Medicine"}</Button>
                 </DialogFooter>
               </form>
             </Form>

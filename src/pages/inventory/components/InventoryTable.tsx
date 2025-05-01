@@ -1,5 +1,5 @@
 import { format } from "date-fns"
-import { MoreHorizontal, ArrowUpDown } from 'lucide-react'
+import { MoreHorizontal, ArrowUpDown, Pencil, Plus, Trash2 } from 'lucide-react'
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -39,6 +39,7 @@ interface InventoryTableProps {
   onDelete: (id: number) => void
   onUpdateStock: (medicine: Medicine) => void
   onView: (medicine: Medicine) => void
+  onEdit: (medicine: Medicine) => void
   isDeleting?: boolean
   deletingId?: number
 }
@@ -49,6 +50,7 @@ export function InventoryTable({
   onDelete,
   onUpdateStock,
   onView,
+  onEdit,
   isDeleting,
   deletingId
 }: InventoryTableProps) {
@@ -130,8 +132,7 @@ export function InventoryTable({
           <div className="text-right">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button className="h-8 w-8 p-0">
-                  <span className="sr-only">Open menu</span>
+                <Button variant="ghost" size="icon">
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
@@ -140,7 +141,9 @@ export function InventoryTable({
                 <DropdownMenuItem onClick={() => onView(medicine)}>
                   View details
                 </DropdownMenuItem>
-                <DropdownMenuItem>Edit medicine</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onEdit(medicine)}>
+                  Edit medicine
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => onUpdateStock(medicine)}>
                   Update stock
                 </DropdownMenuItem>

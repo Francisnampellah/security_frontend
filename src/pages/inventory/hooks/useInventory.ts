@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { Medicine } from "../../../type"
-import { fetchMedicines, deleteMedicine, addMedicine, updateStock, bulkUploadMedicines } from "../../../services/inventory"
+import { fetchMedicines, deleteMedicine, addMedicine, updateMedicine, updateStock, bulkUploadMedicines } from "../../../services/inventory"
 import { bulkUpdateStock } from "../../../services/inventory/stockService"
 import { useNotification } from "../../../hooks/useNotification"
 
@@ -101,6 +101,22 @@ export function useInventory() {
     },
   })
 
+  // Update medicine mutation
+  const updateMutation = useMutation({
+    mutationFn: ({ id, medicine }: { id: number, medicine: any }) => updateMedicine(id, medicine),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['medicines'] })
+      success("Medicine updated", {
+        description: "The medicine has been successfully updated.",
+      })
+    },
+    onError: (error) => {
+      showError("Failed to update medicine", {
+        description: error instanceof Error ? error.message : "An unknown error occurred",
+      })
+    },
+  })
+
   // Filter medicines based on search term
   const filteredMedicines = medicines.filter(
     (medicine) =>
@@ -143,6 +159,7 @@ export function useInventory() {
     error: queryError,
     searchTerm,
     addMutation,
+    updateMutation,
     updateStockMutation,
     filteredMedicines,
     setFilteredMedicines: setSearchTerm,
