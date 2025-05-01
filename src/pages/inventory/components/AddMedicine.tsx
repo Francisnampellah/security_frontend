@@ -18,13 +18,16 @@ import { Input } from "@/components/ui/input"
 import { MedicineFormSchema } from "../schema"
 import { useInventory } from "../hooks/useInventory"
 import { useSupport } from "../hooks/useSupport"
-import { getMedicineTemplate } from "@/services/inventory"
+import { bulkUploadMedicines, getMedicineTemplate } from "@/services/inventory"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useState } from "react"
 
 export function AddMedicineDialog({ open, onOpenChange, onSubmit }: any) {
   const { manufacturers, categories, units, addManufacturerMutation, addCategoryMutation, addUnitMutation } = useSupport()
   const queryClient = useQueryClient();
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const { addMutation } = useInventory()
+  const { addMutation, bulkUploadMutation } = useInventory()
   const form = useForm<z.infer<typeof MedicineFormSchema>>({
     resolver: zodResolver(MedicineFormSchema),
     defaultValues: {
@@ -133,14 +136,29 @@ export function AddMedicineDialog({ open, onOpenChange, onSubmit }: any) {
   }
 
   const handleDownloadTemplate = async () => {
-    const template = await getMedicineTemplate()
-    const blob = new Blob([template], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'medicine_template.xlsx';
-    a.click();
-    URL.revokeObjectURL(url);
+    try {
+      const blob = await getMedicineTemplate();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'medicine_template.xlsx';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading template:', error);
+    }
+  }
+
+  const handleBulkUpload = async (file: File) => {
+    try {
+      await bulkUploadMutation.mutateAsync(file);
+      setSelectedFile(null);
+      onOpenChange(false);
+    } catch (error) {
+      console.error('Error uploading medicines:', error);
+    }
   }
 
   return (
@@ -148,144 +166,193 @@ export function AddMedicineDialog({ open, onOpenChange, onSubmit }: any) {
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Add New Medicine</DialogTitle>
-          <DialogDescription>Enter the details for the new medicine item.</DialogDescription>
+          <DialogDescription>Choose how you want to add medicines.</DialogDescription>
         </DialogHeader>
-        <Button onClick={handleDownloadTemplate}>Download Template</Button>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Medicine Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter medicine name" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+        
+        <Tabs defaultValue="single" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="single">Single Item</TabsTrigger>
+            <TabsTrigger value="bulk">Bulk Upload</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="single" className="min-h-[400px]">
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Medicine Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter medicine name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="manufacturer"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Manufacturer</FormLabel>
-                    <FormControl>
-                      <CreatableSelect
-                        isClearable
-                        options={manufacturerOptions}
-                        styles={selectStyles}
-                        placeholder="Select or create manufacturer"
-                        value={manufacturerOptions.find((option) => option.value === field.value) || null}
-                        onChange={(newValue) => field.onChange(newValue ? newValue.value : "")}
-                        onCreateOption={handleCreateManufacturer}
-                        formatCreateLabel={(inputValue) => `Create "${inputValue}"`}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="manufacturer"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Manufacturer</FormLabel>
+                        <FormControl>
+                          <CreatableSelect
+                            isClearable
+                            options={manufacturerOptions}
+                            styles={selectStyles}
+                            placeholder="Select or create manufacturer"
+                            value={manufacturerOptions.find((option) => option.value === field.value) || null}
+                            onChange={(newValue) => field.onChange(newValue ? newValue.value : "")}
+                            onCreateOption={handleCreateManufacturer}
+                            formatCreateLabel={(inputValue) => `Create "${inputValue}"`}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-              <FormField
-                control={form.control}
-                name="category"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Category</FormLabel>
-                    <FormControl>
-                      <CreatableSelect
-                        isClearable
-                        options={categoryOptions}
-                        styles={selectStyles}
-                        placeholder="Select or create category"
-                        value={categoryOptions.find((option) => option.value === field.value) || null}
-                        onChange={(newValue) => field.onChange(newValue ? newValue.value : "")}
-                        onCreateOption={handleCreateCategory}
-                        formatCreateLabel={(inputValue) => `Create "${inputValue}"`}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+                  <FormField
+                    control={form.control}
+                    name="category"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Category</FormLabel>
+                        <FormControl>
+                          <CreatableSelect
+                            isClearable
+                            options={categoryOptions}
+                            styles={selectStyles}
+                            placeholder="Select or create category"
+                            value={categoryOptions.find((option) => option.value === field.value) || null}
+                            onChange={(newValue) => field.onChange(newValue ? newValue.value : "")}
+                            onCreateOption={handleCreateCategory}
+                            formatCreateLabel={(inputValue) => `Create "${inputValue}"`}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="unit"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Unit</FormLabel>
+                        <FormControl>
+                          <CreatableSelect
+                            isClearable
+                            options={unitOptions}
+                            styles={selectStyles}
+                            placeholder="Select or create unit"
+                            value={unitOptions.find((option) => option.value === field.value) || null}
+                            onChange={(newValue) => field.onChange(newValue ? newValue.value : "")}
+                            onCreateOption={handleCreateUnit}
+                            formatCreateLabel={(inputValue) => `Create "${inputValue}"`}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="sellPrice"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Selling Price</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            placeholder="0.00"
+                            {...field}
+                            onChange={(e) => {
+                              field.onChange(e.target.valueAsNumber || e.target.value)
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name="quantity"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Initial Stock Quantity</FormLabel>
+                      <FormControl>
+                        <Input type="number" min="0" placeholder="0" {...field} />
+                      </FormControl>
+                      <FormDescription>Enter the initial quantity in stock</FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <DialogFooter className="mt-auto">
+                  <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                    Cancel
+                  </Button>
+                  <Button type="submit">Save Medicine</Button>
+                </DialogFooter>
+              </form>
+            </Form>
+          </TabsContent>
+
+          <TabsContent value="bulk" className="min-h-[400px]">
+            <div className="flex flex-col h-full space-y-4">
+              <div className="flex flex-col gap-4">
+                <Button onClick={handleDownloadTemplate}>Download Template</Button>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="file"
+                    accept=".xlsx"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) setSelectedFile(file);
+                    }}
+                    className="flex-1"
+                    id="bulk-upload"
+                  />
+                  <Button onClick={() => document.getElementById('bulk-upload')?.click()}>
+                    Choose File
+                  </Button>
+                </div>
+                {selectedFile && (
+                  <p className="text-sm text-muted-foreground">
+                    Selected file: {selectedFile.name}
+                  </p>
                 )}
-              />
+              </div>
+              <DialogFooter className="mt-auto">
+                <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                  Cancel
+                </Button>
+                <Button 
+                  type="button" 
+                  onClick={() => selectedFile && handleBulkUpload(selectedFile)}
+                  disabled={!selectedFile}
+                >
+                  Upload Medicines
+                </Button>
+              </DialogFooter>
             </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="unit"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Unit</FormLabel>
-                    <FormControl>
-                      <CreatableSelect
-                        isClearable
-                        options={unitOptions}
-                        styles={selectStyles}
-                        placeholder="Select or create unit"
-                        value={unitOptions.find((option) => option.value === field.value) || null}
-                        onChange={(newValue) => field.onChange(newValue ? newValue.value : "")}
-                        onCreateOption={handleCreateUnit}
-                        formatCreateLabel={(inputValue) => `Create "${inputValue}"`}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="sellPrice"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Selling Price</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        placeholder="0.00"
-                        {...field}
-                        onChange={(e) => {
-                          field.onChange(e.target.valueAsNumber || e.target.value)
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <FormField
-              control={form.control}
-              name="quantity"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Initial Stock Quantity</FormLabel>
-                  <FormControl>
-                    <Input type="number" min="0" placeholder="0" {...field} />
-                  </FormControl>
-                  <FormDescription>Enter the initial quantity in stock</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                Cancel
-              </Button>
-              <Button type="submit">Save Medicine</Button>
-            </DialogFooter>
-          </form>
-        </Form>
+          </TabsContent>
+        </Tabs>
       </DialogContent>
     </Dialog>
   )

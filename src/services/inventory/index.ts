@@ -22,8 +22,19 @@ export const updateStock = async ({ medicineId, quantity }: any): Promise<Medici
   return response.data
 } 
 
-export const getMedicineTemplate = async (): Promise<any> => {
-  const response = await axiosInstance.get<Medicine>('/excel/medicine')
-  console.log("Template", response.data)
-  return response.data
+export const getMedicineTemplate = async (): Promise<Blob> => {
+  const response = await axiosInstance.get('/excel/medicine', {
+    responseType: 'blob'
+  });
+  return response.data;
+}
+
+export const bulkUploadMedicines = async (file: File): Promise<void> => {
+  const formData = new FormData();
+  formData.append('file', file);
+  await axiosInstance.post('/excel/bulk-upload/medicine', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
 }

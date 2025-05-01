@@ -2,7 +2,7 @@ import { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { Medicine } from "../../../type"
-import { fetchMedicines, deleteMedicine, addMedicine, updateStock } from "../../../services/inventory"
+import { fetchMedicines, deleteMedicine, addMedicine, updateStock, bulkUploadMedicines } from "../../../services/inventory"
 
 export function useInventory() {
 
@@ -68,6 +68,22 @@ export function useInventory() {
     },
   })
 
+  // Bulk upload mutation
+  const bulkUploadMutation = useMutation({
+    mutationFn: bulkUploadMedicines,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['medicines'] })
+      toast.success("Bulk upload successful", {
+        description: "Medicines have been uploaded successfully.",
+      })
+    },
+    onError: (error) => {
+      toast.error("Bulk upload failed", {
+        description: error.message,
+      })
+    },
+  })
+
   // Filter medicines based on search term
   const filteredMedicines = medicines.filter(
     (medicine) =>
@@ -125,5 +141,6 @@ export function useInventory() {
     openUpdateStockDialog,
     isDeleting: deleteMutation.isPending,
     deletingId: deleteMutation.variables as number,
+    bulkUploadMutation,
   }
 } 
