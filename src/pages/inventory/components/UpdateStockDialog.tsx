@@ -23,7 +23,7 @@ import { Medicine } from "../../../type"
 import { useState } from "react"
 import { Download, Upload } from "lucide-react"
 import { getStockUpdateTemplate } from "../../../services/inventory/stockService"
-// import { useToast } from "@/components/ui/use-toast"
+import { useNotification } from "../../../hooks/useNotification"
 
 interface UpdateStockDialogProps {
   open: boolean
@@ -33,7 +33,7 @@ interface UpdateStockDialogProps {
 
 export function UpdateStockDialog({ open, onOpenChange, medicine }: UpdateStockDialogProps) {
   const { handleUpdateStock, bulkUpdateStockMutation } = useInventory()
-  // const { toast } = useToast()
+  const { error: showError } = useNotification()
   const [file, setFile] = useState<File | null>(null)
 
   const form = useForm<z.infer<typeof UpdateStockSchema>>({
@@ -66,8 +66,9 @@ export function UpdateStockDialog({ open, onOpenChange, medicine }: UpdateStockD
 
   const handleBulkSubmit = async () => {
     if (!file) {
-      console.log("no file")
-
+      showError("No file selected", {
+        description: "Please select a file to upload",
+      })
       return
     }
 
@@ -76,12 +77,9 @@ export function UpdateStockDialog({ open, onOpenChange, medicine }: UpdateStockD
       setFile(null)
       onOpenChange(false)
     } catch (error) {
-      // toast({
-      //   title: "Error",
-      //   description: "Failed to update stock. Please check your file format.",
-      //   variant: "destructive",
-      // })
-      console.log(error)
+      showError("Failed to update stock", {
+        description: error instanceof Error ? error.message : "Please check your file format",
+      })
     }
   }
 
@@ -97,7 +95,9 @@ export function UpdateStockDialog({ open, onOpenChange, medicine }: UpdateStockD
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
     } catch (error) {
-      console.error('Error downloading template:', error);
+      showError("Failed to download template", {
+        description: error instanceof Error ? error.message : "An unknown error occurred",
+      });
     }
   };
 

@@ -37,6 +37,7 @@ export function AddMedicineDialog({ open, onOpenChange, onSubmit }: any) {
       category: "",
       sellPrice: "",
       quantity: "0",
+      dosage: "",
     },
   })
 
@@ -186,6 +187,20 @@ export function AddMedicineDialog({ open, onOpenChange, onSubmit }: any) {
                       <FormLabel>Medicine Name</FormLabel>
                       <FormControl>
                         <Input placeholder="Enter medicine name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="dosage"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Dosage</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter dosage (e.g., 500mg)" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

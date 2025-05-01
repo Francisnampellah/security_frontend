@@ -9,6 +9,7 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 import LoginForm from './components/auth/LoginForm';
 import { Register } from './components/auth/Register';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { Toaster } from "sonner"
 // import { AddMedicineDialog } from './components/pages/inventory/components/AddMedicine';
 
 const queryClient = new QueryClient({
@@ -19,8 +20,6 @@ const queryClient = new QueryClient({
   },
 })
 
-
-
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -28,20 +27,21 @@ function App() {
         <AuthProvider>
           <Routes>
             <Route path="/login" element={<LoginForm />} />
-          <Route path="/register" element={<Register />} />
+            <Route path="/register" element={<Register />} />
 
-          <Route element={<ProtectedRoute />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/dashboard/users" element={<UserManagement />} />
-            <Route path="/dashboard/inventory" element={<Inventory />} />
-            {/* <Route path="/dashboard/inventory/add" element={<AddMedicineDialog open={true} onOpenChange={() => {}} />} />
-            <Route path="/dashboard/inventory/edit/:id" element={<AddMedicineDialog open={true} onOpenChange={() => {}} />} /> */}
-          </Route>
-          
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        </Routes>
-      </AuthProvider>
+            <Route element={<ProtectedRoute />}>
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/dashboard/users" element={<UserManagement />} />
+              <Route path="/dashboard/inventory" element={<Inventory />} />
+              {/* <Route path="/dashboard/inventory/add" element={<AddMedicineDialog open={true} onOpenChange={() => {}} />} />
+              <Route path="/dashboard/inventory/edit/:id" element={<AddMedicineDialog open={true} onOpenChange={() => {}} />} /> */}
+            </Route>
+            
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          </Routes>
+        </AuthProvider>
       </Router>
+      <Toaster richColors position="top-right" />
     </QueryClientProvider>
   );
 }

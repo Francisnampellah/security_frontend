@@ -1,12 +1,12 @@
 import { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { toast } from "sonner"
 import { Medicine } from "../../../type"
 import { fetchMedicines, deleteMedicine, addMedicine, updateStock, bulkUploadMedicines } from "../../../services/inventory"
 import { bulkUpdateStock } from "../../../services/inventory/stockService"
+import { useNotification } from "../../../hooks/useNotification"
 
 export function useInventory() {
-
+  const { success, error: showError } = useNotification()
   const [searchTerm, setSearchTerm] = useState("")
   const [addDialogOpen, setAddDialogOpen] = useState(false)
   const [updateStockDialogOpen, setUpdateStockDialogOpen] = useState(false)
@@ -16,7 +16,7 @@ export function useInventory() {
   const queryClient = useQueryClient()
   
   // Fetch medicines with Tanstack Query
-  const { data: medicines = [], isLoading, isError, error } = useQuery({
+  const { data: medicines = [], isLoading, isError, error: queryError } = useQuery({
     queryKey: ['medicines'],
     queryFn: fetchMedicines,
   })
@@ -26,13 +26,13 @@ export function useInventory() {
     mutationFn: deleteMedicine,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['medicines'] })
-      toast.success("Medicine deleted", {
+      success("Medicine deleted", {
         description: "The medicine has been successfully deleted.",
       })
     },
     onError: (error) => {
-      toast.error("Failed to delete medicine", {
-        description: error.message,
+      showError("Failed to delete medicine", {
+        description: error instanceof Error ? error.message : "An unknown error occurred",
       })
     },
   })
@@ -42,13 +42,13 @@ export function useInventory() {
     mutationFn: addMedicine,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['medicines'] })
-      toast.success("Medicine added", {
+      success("Medicine added", {
         description: "The new medicine has been successfully added.",
       })
     },
     onError: (error) => {
-      toast.error("Failed to add medicine", {
-        description: error.message,
+      showError("Failed to add medicine", {
+        description: error instanceof Error ? error.message : "An unknown error occurred",
       })
     },
   })
@@ -58,13 +58,13 @@ export function useInventory() {
     mutationFn: updateStock,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['medicines'] })
-      toast.success("Stock updated", {
+      success("Stock updated", {
         description: "The stock has been successfully updated.",
       })
     },
     onError: (error) => {
-      toast.error("Failed to update stock", {
-        description: error.message,
+      showError("Failed to update stock", {
+        description: error instanceof Error ? error.message : "An unknown error occurred",
       })
     },
   })
@@ -74,13 +74,13 @@ export function useInventory() {
     mutationFn: bulkUpdateStock,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['medicines'] })
-      toast.success("Stock updated", {
+      success("Stock updated", {
         description: "The stock has been successfully updated.",
       })
     },
     onError: (error) => {
-      toast.error("Failed to update stock", {
-        description: error.message,
+      showError("Failed to update stock", {
+        description: error instanceof Error ? error.message : "An unknown error occurred",
       })
     },
   })
@@ -90,13 +90,13 @@ export function useInventory() {
     mutationFn: bulkUploadMedicines,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['medicines'] })
-      toast.success("Bulk upload successful", {
+      success("Bulk upload successful", {
         description: "Medicines have been uploaded successfully.",
       })
     },
     onError: (error) => {
-      toast.error("Bulk upload failed", {
-        description: error.message,
+      showError("Bulk upload failed", {
+        description: error instanceof Error ? error.message : "An unknown error occurred",
       })
     },
   })
@@ -140,7 +140,7 @@ export function useInventory() {
     medicines: filteredMedicines,
     isLoading,
     isError,
-    error,
+    error: queryError,
     searchTerm,
     addMutation,
     updateStockMutation,
@@ -153,6 +153,7 @@ export function useInventory() {
     updateStockDialogOpen,
     setUpdateStockDialogOpen,
     selectedMedicine,
+    setSelectedMedicine,
     handleDelete,
     handleAddMedicine,
     handleUpdateStock,

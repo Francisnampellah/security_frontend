@@ -34,6 +34,7 @@ export interface Medicine {
     manufacturerId: number
     unitId: number
     categoryId: number
+    dosage?: string
     sellPrice: string
     createdAt: string
     updatedAt: string

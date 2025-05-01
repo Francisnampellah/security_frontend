@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
 import { fetchManufacturers, deleteManufacturer, addManufacturer } from "../../../services/manufacture";
 import { Manufacturer } from "../../../type";
 import { fetchCategories, deleteCategory, createCategory } from "../../../services/category";
 import { fetchUnits, deleteUnit, addUnit } from "../../../services/unit";
+import { useNotification } from "../../../hooks/useNotification";
 
 export function useSupport() {
+  const { success, error: showError } = useNotification();
   const queryClient = useQueryClient();
 
   // Manufacturers
@@ -19,10 +20,12 @@ export function useSupport() {
     mutationFn: deleteManufacturer,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["manufacturers"] });
-      toast.success("Manufacturer deleted successfully");
+      success("Manufacturer deleted successfully");
     },
-    onError: () => {
-      toast.error("Failed to delete manufacturer");
+    onError: (error) => {
+      showError("Failed to delete manufacturer", {
+        description: error instanceof Error ? error.message : "An unknown error occurred",
+      });
     },
   });
 
@@ -30,10 +33,12 @@ export function useSupport() {
     mutationFn: addManufacturer,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["manufacturers"] });
-      toast.success("Manufacturer added successfully");
+      success("Manufacturer added successfully");
     },
-    onError: () => {
-      toast.error("Failed to add manufacturer");
+    onError: (error) => {
+      showError("Failed to add manufacturer", {
+        description: error instanceof Error ? error.message : "An unknown error occurred",
+      });
     },
   });
 
@@ -47,10 +52,12 @@ export function useSupport() {
     mutationFn: deleteCategory,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
-      toast.success("Category deleted successfully");
+      success("Category deleted successfully");
     },
-    onError: () => {
-      toast.error("Failed to delete category");
+    onError: (error) => {
+      showError("Failed to delete category", {
+        description: error instanceof Error ? error.message : "An unknown error occurred",
+      });
     },
   });
 
@@ -58,10 +65,12 @@ export function useSupport() {
     mutationFn: createCategory,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
-      toast.success("Category added successfully");
+      success("Category added successfully");
     },
-    onError: () => {
-      toast.error("Failed to add category");
+    onError: (error) => {
+      showError("Failed to add category", {
+        description: error instanceof Error ? error.message : "An unknown error occurred",
+      });
     },
   });
 
@@ -75,10 +84,12 @@ export function useSupport() {
     mutationFn: deleteUnit,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["units"] });
-      toast.success("Unit deleted successfully");
+      success("Unit deleted successfully");
     },
-    onError: () => {
-      toast.error("Failed to delete unit");
+    onError: (error) => {
+      showError("Failed to delete unit", {
+        description: error instanceof Error ? error.message : "An unknown error occurred",
+      });
     },
   });
 
@@ -86,10 +97,12 @@ export function useSupport() {
     mutationFn: addUnit,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["units"] });
-      toast.success("Unit added successfully");
+      success("Unit added successfully");
     },
-    onError: () => {
-      toast.error("Failed to add unit");
+    onError: (error) => {
+      showError("Failed to add unit", {
+        description: error instanceof Error ? error.message : "An unknown error occurred",
+      });
     },
   });
 

@@ -1,7 +1,7 @@
 "use client"
 
 import { format } from "date-fns"
-import { Calendar, Package, Tag, Truck } from 'lucide-react'
+import { Calendar, Package, Tag, Truck, Pill } from 'lucide-react'
 
 import {
   Dialog,
@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import { Medicine } from "../types"
+import { Medicine } from "../../../type"
 
 interface ViewMedicineDialogProps {
   open: boolean
@@ -29,13 +29,13 @@ export function ViewMedicineDialog({ open, onOpenChange, medicine }: ViewMedicin
       return <Badge variant="destructive">Out of Stock</Badge>
     } else if (quantity < 10) {
       return (
-        <Badge variant="warning" className="bg-orange-500 hover:bg-orange-600">
+        <Badge variant="secondary" className="bg-orange-500 hover:bg-orange-600">
           Low Stock
         </Badge>
       )
     } else {
       return (
-        <Badge variant="success" className="bg-green-500 hover:bg-green-600">
+        <Badge variant="default" className="bg-green-500 hover:bg-green-600">
           In Stock
         </Badge>
       )
@@ -46,9 +46,9 @@ export function ViewMedicineDialog({ open, onOpenChange, medicine }: ViewMedicin
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle className="text-xl">{medicine.name}</DialogTitle>
+          <DialogTitle>{medicine.name}</DialogTitle>
           <DialogDescription>
-            Medicine details and inventory information
+            View detailed information about this medicine
           </DialogDescription>
         </DialogHeader>
 
@@ -73,6 +73,13 @@ export function ViewMedicineDialog({ open, onOpenChange, medicine }: ViewMedicin
                 <span className="text-sm text-muted-foreground">Unit:</span>
                 <span className="text-sm font-medium">{medicine.unit.name}</span>
               </div>
+              {medicine.dosage && (
+                <div className="flex items-center gap-2">
+                  <Pill className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">Dosage:</span>
+                  <span className="text-sm font-medium">{medicine.dosage}</span>
+                </div>
+              )}
               <div className="flex items-center gap-2">
                 <Calendar className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm text-muted-foreground">Added on:</span>
@@ -105,13 +112,13 @@ export function ViewMedicineDialog({ open, onOpenChange, medicine }: ViewMedicin
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
                 <span className="text-sm text-muted-foreground">Current Stock:</span>
-                <div className="text-2xl font-bold">{medicine.stock.quantity} units</div>
-                <div className="mt-1">{getStockStatus(medicine.stock.quantity)}</div>
+                <div className="text-2xl font-bold">{medicine.stock?.quantity ?? 0} units</div>
+                <div className="mt-1">{getStockStatus(medicine.stock?.quantity ?? 0)}</div>
               </div>
               <div>
                 <span className="text-sm text-muted-foreground">Last Updated:</span>
                 <div className="text-sm font-medium">
-                  {format(new Date(medicine.stock.updatedAt), "MMM dd, yyyy 'at' h:mm a")}
+                  {format(new Date(medicine.stock?.updatedAt ?? medicine.updatedAt), "MMM dd, yyyy 'at' h:mm a")}
                 </div>
               </div>
             </div>

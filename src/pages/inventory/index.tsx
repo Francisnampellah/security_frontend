@@ -36,14 +36,14 @@ export default function InventoryPage() {
     updateStockDialogOpen,
     setUpdateStockDialogOpen,
     selectedMedicine,
-    // setSelectedMedicine,
+    setSelectedMedicine,
   } = useInventory()
 
   const [viewDialogOpen, setViewDialogOpen] = useState(false)
   const [ViewAddDialogOpen, setViewAddDialogOpen] = useState(false)
 
   const handleViewMedicine = (medicine) => {
-    // setSelectedMedicine(medicine)
+    setSelectedMedicine(medicine)
     setViewDialogOpen(true)
   }
 

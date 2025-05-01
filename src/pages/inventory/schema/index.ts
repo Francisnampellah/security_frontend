@@ -6,6 +6,7 @@ export const MedicineFormSchema = z.object({
       message: "Medicine name must be at least 2 characters.",
     }),
     manufacturer: z.union([z.string(), z.number()]),
+    dosage: z.string().optional(),
     unit: z.union([z.string(), z.number()]),
     category: z.union([z.string(), z.number()]),
     sellPrice: z.number().or(
