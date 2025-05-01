@@ -23,21 +23,44 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const refreshToken = localStorage.getItem('refreshToken');
-    
-    if (token && refreshToken) {
-      setToken(token);
-      AuthService.getCurrentUser()
-        .then(userData => setUser(userData))
-        .catch(() => {
-          localStorage.removeItem('token');
-          localStorage.removeItem('refreshToken');
-        })
-        .finally(() => setIsLoading(false));
-    } else {
+    const initializeAuth = async () => {
+      const token = localStorage.getItem('token');
+      const refreshToken = localStorage.getItem('refreshToken');
+      
+      if (token) {
+        setToken(token);
+        try {
+          const userData = await AuthService.getCurrentUser();
+          setUser(userData);
+        } catch (error) {
+          // If getting current user fails, try to refresh the token
+          if (refreshToken) {
+            try {
+              const { token: newToken, refreshToken: newRefreshToken } = await AuthService.refreshToken(refreshToken);
+              localStorage.setItem('token', newToken);
+              localStorage.setItem('refreshToken', newRefreshToken);
+              setToken(newToken);
+              const userData = await AuthService.getCurrentUser();
+              setUser(userData);
+            } catch (refreshError) {
+              // If refresh token fails, clear everything
+              localStorage.removeItem('token');
+              localStorage.removeItem('refreshToken');
+              setToken(null);
+              setUser(null);
+            }
+          } else {
+            // If no refresh token, clear everything
+            localStorage.removeItem('token');
+            setToken(null);
+            setUser(null);
+          }
+        }
+      }
       setIsLoading(false);
-    }
+    };
+
+    initializeAuth();
   }, []);
 
   const login = async (email: string, password: string) => {

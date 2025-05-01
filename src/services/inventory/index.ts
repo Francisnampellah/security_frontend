@@ -1,4 +1,4 @@
-import { Medicine } from "../types"
+import { Medicine } from "../../type"
 import axiosInstance from "@/lib/axiosInstance"
 
 export const fetchMedicines = async (): Promise<Medicine[]> => {
@@ -15,11 +15,15 @@ export const addMedicine = async (medicine: any): Promise<Medicine> => {
   return response.data
 }
 
-export const updateStock = async ({ medicineId, operation, quantity, notes }: any): Promise<Medicine> => {
-  const response = await axiosInstance.patch<Medicine>(`/medicine/${medicineId}/stock`, {
-    operation,
+export const updateStock = async ({ medicineId, quantity }: any): Promise<Medicine> => {
+  const response = await axiosInstance.patch<Medicine>(`/stock/${medicineId}`, {
     quantity,
-    notes,
   })
   return response.data
 } 
+
+export const getMedicineTemplate = async (): Promise<any> => {
+  const response = await axiosInstance.get<Medicine>('/excel/medicine')
+  console.log("Template", response.data)
+  return response.data
+}

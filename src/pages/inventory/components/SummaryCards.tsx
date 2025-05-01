@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Medicine } from "../types"
+  import { Skeleton } from "@/components/ui/skeleton"
+  import { Medicine } from "../../../type"
 
 interface SummaryCardsProps {
   medicines: Medicine[]
@@ -30,7 +30,7 @@ export function SummaryCards({ medicines, isLoading }: SummaryCardsProps) {
           {isLoading ? (
             <Skeleton className="h-8 w-16" />
           ) : (
-            <div className="text-2xl font-bold">{medicines.filter((m) => m.stock.quantity <= 0).length}</div>
+            <div className="text-2xl font-bold">{medicines.filter((m) => m.stock && m.stock.quantity <= 0).length}</div>
           )}
         </CardContent>
       </Card>
@@ -43,11 +43,11 @@ export function SummaryCards({ medicines, isLoading }: SummaryCardsProps) {
             <Skeleton className="h-8 w-16" />
           ) : (
             <div className="text-2xl font-bold">
-              {medicines.filter((m) => m.stock.quantity > 0 && m.stock.quantity < 10).length}
+              {medicines.filter((m) => m.stock && m.stock.quantity > 0 && m.stock.quantity < 10).length}
             </div>
           )}
         </CardContent>
       </Card>
     </div>
   )
-} 
+}

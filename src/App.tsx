@@ -1,14 +1,15 @@
 import React from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Dashboard from './components/pages/Dashboard';
-import UserManagement from './components/pages/UserManagement';
-import Inventory from '../src/components/pages/inventory';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Dashboard from './pages/Dashboard';
+import UserManagement from './pages/UserManagement';
+import Inventory from './pages/inventory';
 import './App.css'
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import LoginForm from './components/auth/LoginForm';
 import { Register } from './components/auth/Register';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+// import { AddMedicineDialog } from './components/pages/inventory/components/AddMedicine';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -33,9 +34,11 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/dashboard/users" element={<UserManagement />} />
             <Route path="/dashboard/inventory" element={<Inventory />} />
+            {/* <Route path="/dashboard/inventory/add" element={<AddMedicineDialog open={true} onOpenChange={() => {}} />} />
+            <Route path="/dashboard/inventory/edit/:id" element={<AddMedicineDialog open={true} onOpenChange={() => {}} />} /> */}
           </Route>
           
-          <Route path="/" element={<ProtectedRoute />} />
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </AuthProvider>
       </Router>

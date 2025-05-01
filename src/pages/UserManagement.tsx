@@ -1,5 +1,5 @@
 import React from 'react';
-import DashboardLayout from '../layout/DashboardLayout';
+import DashboardLayout from '../components/layout/DashboardLayout';
 
 const UserManagement = () => {
     // Mock data - replace with actual data from your backend

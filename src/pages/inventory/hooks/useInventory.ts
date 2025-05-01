@@ -1,14 +1,16 @@
 import { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
-import { Medicine } from "../types"
-import { fetchMedicines, deleteMedicine, addMedicine, updateStock } from "../api"
+import { Medicine } from "../../../type"
+import { fetchMedicines, deleteMedicine, addMedicine, updateStock } from "../../../services/inventory"
 
 export function useInventory() {
+
   const [searchTerm, setSearchTerm] = useState("")
   const [addDialogOpen, setAddDialogOpen] = useState(false)
   const [updateStockDialogOpen, setUpdateStockDialogOpen] = useState(false)
   const [selectedMedicine, setSelectedMedicine] = useState<Medicine | null>(null)
+  // const [openViewDialog, setOpenViewDialog] = useState(false)
   
   const queryClient = useQueryClient()
   
@@ -76,6 +78,7 @@ export function useInventory() {
 
   // Function to handle delete
   const handleDelete = (id: number) => {
+    console.log("Deletes")
     deleteMutation.mutate(id)
   }
   
@@ -85,13 +88,13 @@ export function useInventory() {
   }
   
   // Function to handle update stock
-  const handleUpdateStock = (values: any) => {
-    if (selectedMedicine) {
+  const handleUpdateStock = (values: {medicineId: Number, quantity: Number}) => {
+    console.log("those any values",values)
+ 
       updateStockMutation.mutate({
-        medicineId: selectedMedicine.id,
-        ...values,
+        medicineId: values.medicineId,
+        quantity: values.quantity,
       })
-    }
   }
   
   // Function to open update stock dialog
@@ -106,6 +109,10 @@ export function useInventory() {
     isError,
     error,
     searchTerm,
+    addMutation,
+    updateStockMutation,
+    filteredMedicines,
+    setFilteredMedicines: setSearchTerm,
     setSearchTerm,
     addDialogOpen,
     setAddDialogOpen,

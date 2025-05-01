@@ -1,6 +1,6 @@
 "use client"
 
-import { Download, FileUp, Filter, Plus, Search, SlidersHorizontal } from 'lucide-react'
+import { Download, FileUp, Filter, Plus, Search, SlidersHorizontal, View } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
@@ -16,6 +16,8 @@ import { useInventory } from "./hooks/useInventory"
 import DashboardLayout from '@/components/layout/DashboardLayout'
 import { ViewMedicineDialog } from "./components/ViewMedicineDialog"
 import { useState } from "react"
+import { AddMedicineDialog } from "../inventory/components/AddMedicine"
+import { UpdateStockDialog } from "./components/UpdateStockDialog"
 
 export default function InventoryPage() {
   const {
@@ -31,13 +33,17 @@ export default function InventoryPage() {
     openUpdateStockDialog,
     isDeleting,
     deletingId,
+    updateStockDialogOpen,
+    setUpdateStockDialogOpen,
+    selectedMedicine,
+    // setSelectedMedicine,
   } = useInventory()
 
   const [viewDialogOpen, setViewDialogOpen] = useState(false)
-  const [selectedMedicine, setSelectedMedicine] = useState(null)
+  const [ViewAddDialogOpen, setViewAddDialogOpen] = useState(false)
 
   const handleViewMedicine = (medicine) => {
-    setSelectedMedicine(medicine)
+    // setSelectedMedicine(medicine)
     setViewDialogOpen(true)
   }
 
@@ -50,7 +56,7 @@ export default function InventoryPage() {
           <p className="text-muted-foreground">Manage your medicine inventory, stock levels, and pricing</p>
         </div>
         <div className="flex items-center gap-3">
-          <Button onClick={() => setAddDialogOpen(true)} className="bg-primary hover:bg-primary/90">
+          <Button onClick={() => setViewAddDialogOpen(true)} className="bg-primary hover:bg-primary/90">
             <Plus className="mr-2 h-4 w-4" />
             Add Medicine
           </Button>
@@ -147,7 +153,26 @@ export default function InventoryPage() {
         onOpenChange={setViewDialogOpen}
         medicine={selectedMedicine}
       />
+
+      {/* Add Medicine Dialog */}
+      <AddMedicineDialog
+        open={ViewAddDialogOpen}
+        onOpenChange={setViewAddDialogOpen}
+        onSubmit={(values) => {
+          console.log("Submitted values:", values)
+          setAddDialogOpen(false)
+        }}
+      />
+
+      {/* Update Stock Dialog */}
+      <UpdateStockDialog
+        open={updateStockDialogOpen}
+        onOpenChange={setUpdateStockDialogOpen}
+        medicine={selectedMedicine}
+      />
+
     </div>
+
     </DashboardLayout>
   )
 } 

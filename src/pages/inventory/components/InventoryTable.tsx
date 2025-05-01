@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Medicine } from "../types"
+import { Medicine } from "../../../type"
 import {
   flexRender,
   getCoreRowModel,
@@ -25,7 +25,6 @@ import {
   type ColumnFiltersState,
 } from "@tanstack/react-table"
 import { useState } from "react"
-import { Input } from "@/components/ui/input"
 import {
   Select,
   SelectContent,
@@ -78,89 +77,46 @@ export function InventoryTable({
   const columns: ColumnDef<Medicine>[] = [
     {
       accessorKey: "name",
-      header: ({ column }) => {
-        return (
-          <Button
-            // variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Name
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        )
+      header: "Name",
+      cell: ({ row }) => {
+        return <div className="font-medium">{row.getValue("name")}</div>
       },
     },
     {
-      accessorKey: "category.name",
-      header: "Category",
-    },
-    {
-      accessorKey: "manufacturer.name",
+      accessorKey: "manufacturer",
       header: "Manufacturer",
+      cell: ({ row }) => {
+        const manufacturer = row.original.manufacturer
+        return <div>{manufacturer?.name || '-'}</div>
+      },
     },
     {
-      accessorKey: "unit.name",
+      accessorKey: "category",
+      header: "Category",
+      cell: ({ row }) => {
+        const category = row.original.category
+        return <div>{category?.name || '-'}</div>
+      },
+    },
+    {
+      accessorKey: "stock",
+      header: "Quantity",
+      cell: ({ row }) => {
+        const stock = row.original.stock
+        return <div>{stock?.quantity ?? 0}</div>
+      },
+    },
+    {
+      accessorKey: "unit",
       header: "Unit",
-    },
-    {
-      accessorKey: "sellPrice",
-      header: ({ column }) => {
-        return (
-          <Button
-            // variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Price
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
       cell: ({ row }) => {
-        const price = parseFloat(row.getValue("sellPrice"))
-        return <div className="text-right">${price.toFixed(2)}</div>
-      },
-    },
-    {
-      accessorKey: "stock.quantity",
-      header: "Stock Status",
-      cell: ({ row }) => {
-        const quantity = row.getValue("stock.quantity") as number
-        return getStockStatus(quantity)
-      },
-    },
-    {
-      accessorKey: "stock.quantity",
-      header: ({ column }) => {
-        return (
-          <Button
-            // variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Quantity
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
-    },
-    {
-      accessorKey: "updatedAt",
-      header: ({ column }) => {
-        return (
-          <Button
-            // variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Last Updated
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
-      cell: ({ row }) => {
-        return format(new Date(row.getValue("updatedAt")), "MMM dd, yyyy")
+        const unit = row.original.unit
+        return <div>{unit?.name || '-'}</div>
       },
     },
     {
       id: "actions",
+      header: "Actions",
       cell: ({ row }) => {
         const medicine = row.original
         return (
@@ -194,7 +150,7 @@ export function InventoryTable({
           </div>
         )
       },
-    },
+    }
   ]
 
   const table = useReactTable({
@@ -220,14 +176,10 @@ export function InventoryTable({
         <TableHeader>
           <TableRow>
             <TableHead>Name</TableHead>
-            <TableHead>Category</TableHead>
             <TableHead>Manufacturer</TableHead>
-            <TableHead>Unit</TableHead>
-            <TableHead className="text-right">Price</TableHead>
-            <TableHead>Stock Status</TableHead>
+            <TableHead>Category</TableHead>
             <TableHead>Quantity</TableHead>
-            <TableHead>Last Updated</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+            <TableHead>Unit</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -236,12 +188,8 @@ export function InventoryTable({
               <TableCell><Skeleton className="h-5 w-32" /></TableCell>
               <TableCell><Skeleton className="h-5 w-24" /></TableCell>
               <TableCell><Skeleton className="h-5 w-24" /></TableCell>
-              <TableCell><Skeleton className="h-5 w-16" /></TableCell>
-              <TableCell className="text-right"><Skeleton className="h-5 w-16 ml-auto" /></TableCell>
-              <TableCell><Skeleton className="h-5 w-24" /></TableCell>
               <TableCell><Skeleton className="h-5 w-12" /></TableCell>
-              <TableCell><Skeleton className="h-5 w-24" /></TableCell>
-              <TableCell className="text-right"><Skeleton className="h-8 w-8 ml-auto" /></TableCell>
+              <TableCell><Skeleton className="h-5 w-16" /></TableCell>
             </TableRow>
           ))}
         </TableBody>

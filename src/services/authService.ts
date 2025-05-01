@@ -33,8 +33,8 @@ export const AuthService = {
 
   async refreshToken(refreshToken: string) {
     const response = await axiosInstance.post(`${API_URL}/auth/refresh`, {
-      refreshToken,
+      refreshToken
     });
     return response.data;
-  },
+  }
 };
