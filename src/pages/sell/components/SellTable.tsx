@@ -38,6 +38,9 @@ interface SellTableProps {
   onView: (sell: Sell) => void
   isViewing?: boolean
   viewingId?: number
+  onsell?:any,
+  isSelling?:any,
+  sellingId?:any
 }
 
 export function SellTable({
@@ -131,6 +134,9 @@ export function SellTable({
       globalFilter,
     },
   })
+
+
+  console.log(sells)
 
   return (
     <div className="mx-auto mt-10">

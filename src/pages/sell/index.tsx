@@ -13,6 +13,7 @@ import { Medicine } from "../../type"
 export default function SellPage() {
   const {
     medicines,
+    sells, // Ensure 'sells' is included here
     isLoading,
     isError,
     error,
@@ -52,9 +53,11 @@ export default function SellPage() {
         <SellTable
           sells={sells}
           isLoading={isLoading}
-          onSell={handleOpenSellDialog}
+          onView={setSellDialogOpen}
+          onsell={handleOpenSellDialog}
           isSelling={isSelling}
           sellingId={sellingId}
+          
         />
 
         <SellDialog

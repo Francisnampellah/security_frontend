@@ -23,6 +23,23 @@ export function useSell() {
     queryKey: ['medicines'],
     queryFn: fetchMedicines,
   })
+
+  // Fetch sells with Tanstack Query
+  const { data: sells = [], error: sellsQueryError, isError: isSellsError } = useQuery({
+    queryKey: ['sells'],
+    queryFn: getSells,
+  })
+
+  if (isSellsError) {
+    showError("Failed to fetch sells", {
+      description: sellsQueryError instanceof Error ? sellsQueryError.message : "An unknown error occurred",
+    })
+  } else {
+    queryClient.invalidateQueries({ queryKey: ['sells'] })
+    success("Sells fetched successfully", {
+      description: "The sells have been successfully fetched.",
+    })
+  }
   
   // Sell mutation
   const sellMutation = useMutation({
@@ -89,6 +106,7 @@ export function useSell() {
     isError,
     error: queryError,
     searchTerm,
+    sells,
     setSearchTerm,
     sellDialogOpen,
     setSellDialogOpen,
