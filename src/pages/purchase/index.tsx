@@ -51,7 +51,7 @@ export default function PurchasePage() {
     <DashboardLayout>
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
+          {/* <div className="flex items-center space-x-2">
             <Input
               placeholder="Search purchases..."
               value={searchTerm}
@@ -61,11 +61,7 @@ export default function PurchasePage() {
             <Button variant="outline" size="icon">
               <Search className="h-4 w-4" />
             </Button>
-          </div>
-          <Button onClick={handleAddPurchase}>
-            <Plus className="h-4 w-4 mr-2" />
-            Add Purchase
-          </Button>
+          </div> */}
         </div>
 
         <PurchaseTable

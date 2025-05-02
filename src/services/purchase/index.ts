@@ -1,6 +1,5 @@
 import axiosInstance from "@/lib/axiosInstance";
 import { Purchase } from "../../type";
-import { updateStock } from "../inventory/stockService";
 
 export const createPurchase = async (purchase: Purchase): Promise<Purchase> => {
   const response = await axiosInstance.post<Purchase>('/purchase/', purchase);
