@@ -64,3 +64,65 @@ export interface Medicine {
       updatedAt: string
     }
   }
+
+  export interface Batch {
+    id: number;
+    purchaseDate: string;
+    note?: string;
+  }
+  
+  export interface Purchase {
+    id: number;
+    medicineId: number;
+    batchId: number;
+    userId: number;
+    quantity: number;
+    costPerUnit: string;
+    createdAt: string;
+    updatedAt: string;
+    medicine: {
+      id: number;
+      name: string;
+      manufacturerId: number;
+      unitId: number;
+      categoryId: number;
+      dosage: string | null;
+      sellPrice: string;
+      createdAt: string;
+      updatedAt: string;
+      manufacturer: {
+        id: number;
+        name: string;
+        createdAt: string;
+        updatedAt: string;
+      };
+      unit: {
+        id: number;
+        name: string;
+        createdAt: string;
+        updatedAt: string;
+      };
+      category: {
+        id: number;
+        name: string;
+        createdAt: string;
+        updatedAt: string;
+      };
+    };
+    batch: {
+      id: number;
+      purchaseDate: string;
+      createdAt: string;
+      updatedAt: string;
+      note: string | null;
+    };
+    user: {
+      id: number;
+      name: string;
+      email: string;
+      role: string;
+      createdAt: string;
+      updatedAt: string;
+    };
+  }
+    

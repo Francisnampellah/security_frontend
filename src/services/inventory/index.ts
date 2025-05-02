@@ -15,9 +15,11 @@ export const addMedicine = async (medicine: any): Promise<Medicine> => {
   return response.data
 }
 
-export const updateStock = async ({ medicineId, quantity }: any): Promise<Medicine> => {
+export const updateStock = async ({ medicineId, quantity, pricePerUnit, batchId }: any): Promise<Medicine> => {
   const response = await axiosInstance.patch<Medicine>(`/stock/${medicineId}`, {
     quantity,
+    pricePerUnit,
+    batchId,
   })
   return response.data
 }

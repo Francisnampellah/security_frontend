@@ -2,7 +2,7 @@
 
 import type * as React from "react"
 import { Link, useLocation } from "react-router-dom"
-import { LayoutDashboard, Package, Users } from "lucide-react"
+import { LayoutDashboard, Package, Users, ShoppingCart } from "lucide-react"
 
 import {
   Sidebar,
@@ -43,6 +43,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           title: "Inventory",
           icon: Package,
           path: "/dashboard/inventory",
+        },
+        {
+          title: "Purchase",
+          icon: ShoppingCart,
+          path: "/dashboard/purchase",
         },
       ],
     },

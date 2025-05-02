@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Dashboard from './pages/Dashboard';
 import UserManagement from './pages/UserManagement';
 import Inventory from './pages/inventory';
+import Purchase from './pages/purchase';
 import './App.css'
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -33,6 +34,7 @@ function App() {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/dashboard/users" element={<UserManagement />} />
               <Route path="/dashboard/inventory" element={<Inventory />} />
+              <Route path="/dashboard/purchase" element={<Purchase />} />
               {/* <Route path="/dashboard/inventory/add" element={<AddMedicineDialog open={true} onOpenChange={() => {}} />} />
               <Route path="/dashboard/inventory/edit/:id" element={<AddMedicineDialog open={true} onOpenChange={() => {}} />} /> */}
             </Route>

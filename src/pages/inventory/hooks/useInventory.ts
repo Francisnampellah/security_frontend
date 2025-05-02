@@ -137,12 +137,14 @@ export function useInventory() {
   }
   
   // Function to handle update stock
-  const handleUpdateStock = (values: {medicineId: Number, quantity: Number}) => {
+  const handleUpdateStock = (values: {medicineId: number, quantity: number, batchId: number, pricePerUnit: number}) => {
     console.log("those any values",values)
  
       updateStockMutation.mutate({
         medicineId: values.medicineId,
         quantity: values.quantity,
+        batchId: values.batchId,
+        pricePerUnit: values.pricePerUnit,
       })
   }
   

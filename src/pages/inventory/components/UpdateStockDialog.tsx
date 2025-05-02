@@ -19,11 +19,14 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { UpdateStockSchema } from "../schema"
 import { useInventory } from "../hooks/useInventory"
-import { Medicine } from "../../../type"
+import { Medicine, Batch } from "../../../type"
 import { useState } from "react"
 import { Download, Upload } from "lucide-react"
-import { getStockUpdateTemplate } from "../../../services/inventory/stockService"
+import { getStockUpdateTemplate, fetchBatches } from "../../../services/inventory/stockService"
 import { useNotification } from "../../../hooks/useNotification"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import CreatableSelect from "react-select/creatable"
+import { createBatch } from "../../../services/batch"
 
 interface UpdateStockDialogProps {
   open: boolean
@@ -31,15 +34,54 @@ interface UpdateStockDialogProps {
   medicine: Medicine | null
 }
 
+type CreateBatchPayload = Omit<Batch, 'id'>
+
 export function UpdateStockDialog({ open, onOpenChange, medicine }: UpdateStockDialogProps) {
   const { handleUpdateStock, bulkUpdateStockMutation } = useInventory()
-  const { error: showError } = useNotification()
+  const { error: showError, success: showSuccess } = useNotification()
   const [file, setFile] = useState<File | null>(null)
+  const [selectedBatchId, setSelectedBatchId] = useState<string>("")
+  const queryClient = useQueryClient()
+
+  const { data: batches = [], isLoading: isLoadingBatches } = useQuery({
+    queryKey: ['batches'],
+    queryFn: fetchBatches,
+  })
+
+  const createBatchMutation = useMutation({
+    mutationFn: createBatch,
+    onSuccess: (newBatch) => {
+      queryClient.invalidateQueries({ queryKey: ['batches'] })
+      showSuccess("Batch created successfully")
+      setSelectedBatchId(newBatch.id.toString())
+    },
+    onError: (error) => {
+      showError("Failed to create batch", {
+        description: error instanceof Error ? error.message : "An unknown error occurred"
+      })
+    }
+  })
+
+  const handleCreateBatch = async (inputValue: string) => {
+    try {
+      const newBatch = await createBatchMutation.mutateAsync({
+        note: inputValue,
+        purchaseDate: new Date().toISOString()
+      } as CreateBatchPayload)
+      
+      // Auto-select the newly created batch
+      form.setValue('batchId', newBatch.id.toString())
+    } catch (error) {
+      console.error("Error creating batch:", error)
+    }
+  }
 
   const form = useForm<z.infer<typeof UpdateStockSchema>>({
     resolver: zodResolver(UpdateStockSchema),
     defaultValues: {
       quantity: "0",
+      batchId: "",
+      pricePerUnit: "0",
     },
   })
 
@@ -47,10 +89,14 @@ export function UpdateStockDialog({ open, onOpenChange, medicine }: UpdateStockD
     if (!medicine) return
 
     const quantity = Number.parseInt(values.quantity)
+    const batchId = Number.parseInt(values.batchId)
+    const pricePerUnit = Number.parseFloat(values.pricePerUnit)
 
     handleUpdateStock({
       medicineId: medicine.id,
       quantity,
+      batchId,
+      pricePerUnit,
     })
     
     form.reset()
@@ -72,9 +118,20 @@ export function UpdateStockDialog({ open, onOpenChange, medicine }: UpdateStockD
       return
     }
 
+    if (!selectedBatchId) {
+      showError("No batch selected", {
+        description: "Please select a batch for the bulk update",
+      })
+      return
+    }
+
     try {
-      await bulkUpdateStockMutation.mutateAsync(file)
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('batchId', selectedBatchId);
+      await bulkUpdateStockMutation.mutateAsync(formData);
       setFile(null)
+      setSelectedBatchId("")
       onOpenChange(false)
     } catch (error) {
       showError("Failed to update stock", {
@@ -101,6 +158,16 @@ export function UpdateStockDialog({ open, onOpenChange, medicine }: UpdateStockD
     }
   };
 
+  // Convert batches to format required by react-select
+  const batchOptions = Array.isArray(batches?.data) 
+    ? batches.data.map((batch: any) => ({
+        value: batch.id.toString(),
+        label: `Batch #${batch.id} - ${new Date(batch.purchaseDate).toLocaleDateString()}`,
+      }))
+    : [];
+
+  console.log('Batch options:', batchOptions);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px]">
@@ -123,6 +190,30 @@ export function UpdateStockDialog({ open, onOpenChange, medicine }: UpdateStockD
                 <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
                   <FormField
                     control={form.control}
+                    name="batchId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Batch</FormLabel>
+                        <FormControl>
+                          <CreatableSelect
+                            options={batchOptions}
+                            value={batchOptions.find(option => option.value === field.value)}
+                            onChange={(option) => field.onChange(option?.value || "")}
+                            onCreateOption={handleCreateBatch}
+                            placeholder="Select or create a batch"
+                            className="w-full"
+                            isLoading={isLoadingBatches || createBatchMutation.isPending}
+                            isClearable
+                            noOptionsMessage={() => "No batches found. Create a new one."}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
                     name="quantity"
                     render={({ field }) => (
                       <FormItem>
@@ -134,6 +225,21 @@ export function UpdateStockDialog({ open, onOpenChange, medicine }: UpdateStockD
                       </FormItem>
                     )}
                   />
+
+                  <FormField
+                    control={form.control}
+                    name="pricePerUnit"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Price per Unit</FormLabel>
+                        <FormControl>
+                          <Input type="number" min="0" placeholder="0" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
 
                   <DialogFooter>
                     <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
@@ -160,44 +266,47 @@ export function UpdateStockDialog({ open, onOpenChange, medicine }: UpdateStockD
                 </Button>
               </div>
 
-              <Form {...form}>
-                <div className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="file"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Upload Excel File</FormLabel>
-                        <FormControl>
-                          <div className="flex flex-col gap-4">
-                            <Input
-                              type="file"
-                              accept=".xlsx"
-                              onChange={handleFileChange}
-                              className="w-full"
-                            />
-                            {file && (
-                              <p className="text-sm text-muted-foreground">
-                                Selected file: {file.name}
-                              </p>
-                            )}
-                            <Button
-                              type="button"
-                              onClick={handleBulkSubmit}
-                              disabled={!file}
-                              className="flex items-center gap-2 self-end"
-                            >
-                              <Upload className="h-4 w-4" />
-                              Upload
-                            </Button>
-                          </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Batch</label>
+                  <CreatableSelect
+                    options={batchOptions}
+                    value={batchOptions.find(option => option.value === selectedBatchId)}
+                    onChange={(option) => setSelectedBatchId(option?.value || "")}
+                    placeholder="Select or create a batch"
+                    className="w-full"
+                    isLoading={isLoadingBatches}
+                    isClearable
+                    noOptionsMessage={() => "No batches found. Create a new one."}
                   />
                 </div>
-              </Form>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Upload Excel File</label>
+                  <div className="flex flex-col gap-4">
+                    <Input
+                      type="file"
+                      accept=".xlsx"
+                      onChange={handleFileChange}
+                      className="w-full"
+                    />
+                    {file && (
+                      <p className="text-sm text-muted-foreground">
+                        Selected file: {file.name}
+                      </p>
+                    )}
+                    <Button
+                      type="button"
+                      onClick={handleBulkSubmit}
+                      disabled={!file || !selectedBatchId}
+                      className="flex items-center gap-2 self-end"
+                    >
+                      <Upload className="h-4 w-4" />
+                      Upload
+                    </Button>
+                  </div>
+                </div>
+              </div>
 
               <DialogFooter>
                 <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

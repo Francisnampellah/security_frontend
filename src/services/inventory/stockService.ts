@@ -11,8 +11,11 @@ export const fetchStockByMedicineId = async (medicineId: number) => {
   return response.data;
 };
 
-export const updateStock = async (medicineId: number, quantity: number) => {
-  const response = await axiosInstance.put(`/stock/medicine/${medicineId}`, { quantity });
+export const updateStock = async ({ medicineId, quantity, batchId }: { medicineId: number; quantity: number; batchId: number }) => {
+  const response = await axiosInstance.patch(`/stock/${medicineId}`, {
+    quantity,
+    batchId,
+  });
   return response.data;
 };
 
@@ -28,13 +31,16 @@ export const getStockUpdateTemplate = async (): Promise<Blob> => {
   return response.data;
 };
 
-export const bulkUpdateStock = async (file: File) => {
-  const formData = new FormData();
-  formData.append('file', file);
+export const bulkUpdateStock = async (formData: FormData) => {
   const response = await axiosInstance.post('/excel-stock/bulk-upload/stock', formData, {
     headers: {
-      'Content-Type': 'multipart/form-data'
-    }
+      'Content-Type': 'multipart/form-data',
+    },
   });
+  return response.data;
+};
+
+export const fetchBatches = async () => {
+  const response = await axiosInstance.get('/batch');
   return response.data;
 };

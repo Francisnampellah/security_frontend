@@ -23,4 +23,11 @@ export const UpdateStockSchema = z.object({
   quantity: z.string().refine((val) => !isNaN(Number.parseInt(val)), {
     message: "Quantity must be a valid number.",
   }),
+  batchId: z.string().refine((val) => !isNaN(Number.parseInt(val)), {
+    message: "Batch must be selected.",
+  }),
+  pricePerUnit: z.string().refine((val) => !isNaN(Number.parseFloat(val)), {
+    message: "Price per unit must be a valid number.",
+  }),
+
 })
