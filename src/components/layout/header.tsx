@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useNavigate } from "react-router-dom";
+import { AuthService } from "@/services/authService";
 
 interface HeaderProps {
   date: Date;
@@ -30,9 +31,15 @@ const Header: React.FC<HeaderProps> = ({ date, setDate, Title = "POS SYSTEM" }) 
     image: "https://ui-avatars.com/api/?name=Nampellah&background=0D8ABC&color=fff"
   };
 
-  const handleLogout = () => {
-    // Add your logout logic here
-    navigate('/login');
+  const handleLogout = async () => {
+    try {
+      await AuthService.logout();
+      // navigate('/login');
+    } catch (error) {
+      console.error('Error during logout:', error);
+      // Still navigate to login even if there's an error
+      // navigate('/login');
+    }
   };
 
   return (
