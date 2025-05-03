@@ -20,6 +20,7 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { fetchBatches } from "../../../services/batch"
+import { formatCurrency } from "../../../utils/formatCurrency"
 
 interface AddPurchaseDialogProps {
   open: boolean
@@ -89,7 +90,7 @@ export function AddPurchaseDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl space-y-6">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold flex items-center gap-2">
             <Info className="h-6 w-6" />
@@ -114,7 +115,7 @@ export function AddPurchaseDialog({
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">Purchase Details</h3>
           <Separator />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label htmlFor="batch" className="flex items-center gap-2">
                 <Tag className="h-4 w-4" />
@@ -151,7 +152,7 @@ export function AddPurchaseDialog({
                 onChange={(e) => setFormData({ ...formData, quantity: parseInt(e.target.value) })}
                 required
               />
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-muted-foreground">
                 Unit: {purchase?.medicine.unit.name}
               </p>
             </div>
@@ -178,7 +179,7 @@ export function AddPurchaseDialog({
         <div className="space-y-2">
           <Label className="text-sm font-medium">Total Cost</Label>
           <p className="text-lg font-semibold">
-            ${(parseFloat(formData.costPerUnit) * formData.quantity).toFixed(2)}
+            {formatCurrency(parseFloat(formData.costPerUnit) * formData.quantity)}
           </p>
         </div>
 

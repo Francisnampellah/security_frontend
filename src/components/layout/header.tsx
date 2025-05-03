@@ -16,14 +16,15 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 interface HeaderProps {
   date: Date;
   setDate: (date: Date) => void;
+  Title?:string
 }
 
-const Header: React.FC<HeaderProps> = ({ date, setDate }) => {
+const Header: React.FC<HeaderProps> = ({ date, setDate,Title = "POS SYSTEM" }) => {
 
   return (
-<header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-white px-6">
+<header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b mb-4 bg-white px-6">
 <div className="flex-1">
-  <h1 className="text-xl font-semibold">POS Dashboard</h1>
+  <h1 className="text-xl font-semibold">{Title}</h1>
 </div>
 <div className="flex items-center gap-4">
   <Popover>

@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input"
 import { SellSchema } from "../schema"
 import { Medicine, Sell } from "../../../type"
 import { useEffect } from "react"
+import { formatCurrency } from "../../../utils/formatCurrency"
 
 interface SellDialogProps {
   open: boolean
@@ -61,15 +62,15 @@ export function SellDialog({ open, onOpenChange, medicine, onSubmit }: SellDialo
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-[425px] space-y-6">
         <DialogHeader>
-          <DialogTitle>Sell {medicine.name}</DialogTitle>
-          <DialogDescription>
-            Enter the quantity to sell this medicine. Price per unit: ${Number(medicine.sellPrice).toFixed(2)}
+          <DialogTitle className="text-2xl font-bold">Sell {medicine.name}</DialogTitle>
+          <DialogDescription className="text-muted-foreground">
+            Enter the quantity to sell this medicine. Price per unit: {formatCurrency(medicine.sellPrice)}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
             <FormField
               control={form.control}
               name="quantity"
@@ -106,7 +107,10 @@ export function SellDialog({ open, onOpenChange, medicine, onSubmit }: SellDialo
                 </FormItem>
               )}
             />
-            <DialogFooter>
+            <DialogFooter className="flex justify-end space-x-2">
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                Cancel
+              </Button>
               <Button type="submit">Sell</Button>
             </DialogFooter>
           </form>

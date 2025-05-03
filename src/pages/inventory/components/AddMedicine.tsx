@@ -22,6 +22,7 @@ import { bulkUploadMedicines, getMedicineTemplate } from "@/services/inventory"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useState, useEffect } from "react"
 import { Medicine } from "../../../type"
+import { Download } from "lucide-react"
 
 interface AddMedicineDialogProps {
   open: boolean
@@ -210,21 +211,23 @@ export function AddMedicineDialog({ open, onOpenChange, onSubmit, medicine }: Ad
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] space-y-6">
         <DialogHeader>
-          <DialogTitle>{medicine ? "Update Medicine" : "Add New Medicine"}</DialogTitle>
-          <DialogDescription>{medicine ? "Update the medicine details." : "Choose how you want to add medicines."}</DialogDescription>
+          <DialogTitle className="text-2xl font-bold">{medicine ? "Update Medicine" : "Add New Medicine"}</DialogTitle>
+          <DialogDescription className="text-muted-foreground">
+            {medicine ? "Update the medicine details." : "Choose how you want to add medicines."}
+          </DialogDescription>
         </DialogHeader>
         
-        <Tabs defaultValue={medicine ? "single" : "bulk"} className="w-full">
+        <Tabs defaultValue={medicine ? "single" : "bulk"} className="w-full space-y-6">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="single">Single Item</TabsTrigger>
             <TabsTrigger value="bulk" disabled={!!medicine}>Bulk Upload</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="single" className="min-h-[400px]">
+          <TabsContent value="single" className="space-y-6">
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+              <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
                 <FormField
                   control={form.control}
                   name="name"
@@ -364,7 +367,7 @@ export function AddMedicineDialog({ open, onOpenChange, onSubmit, medicine }: Ad
                   )}
                 />
 
-                <DialogFooter className="mt-auto">
+                <DialogFooter className="flex justify-end space-x-2">
                   <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                     Cancel
                   </Button>
@@ -374,10 +377,13 @@ export function AddMedicineDialog({ open, onOpenChange, onSubmit, medicine }: Ad
             </Form>
           </TabsContent>
 
-          <TabsContent value="bulk" className="min-h-[400px]">
-            <div className="flex flex-col h-full space-y-4">
+          <TabsContent value="bulk" className="space-y-6">
+            <div className="flex flex-col space-y-6">
               <div className="flex flex-col gap-4">
-                <Button onClick={handleDownloadTemplate}>Download Template</Button>
+                <Button variant="outline" onClick={handleDownloadTemplate} className="flex items-center gap-2">
+                  <Download className="h-4 w-4" />
+                  Download Template
+                </Button>
                 <div className="flex items-center gap-2">
                   <input
                     type="file"
@@ -389,7 +395,7 @@ export function AddMedicineDialog({ open, onOpenChange, onSubmit, medicine }: Ad
                     className="flex-1"
                     id="bulk-upload"
                   />
-                  <Button onClick={() => document.getElementById('bulk-upload')?.click()}>
+                  <Button variant="outline" onClick={() => document.getElementById('bulk-upload')?.click()}>
                     Choose File
                   </Button>
                 </div>
@@ -399,7 +405,7 @@ export function AddMedicineDialog({ open, onOpenChange, onSubmit, medicine }: Ad
                   </p>
                 )}
               </div>
-              <DialogFooter className="mt-auto">
+              <DialogFooter className="flex justify-end space-x-2">
                 <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                   Cancel
                 </Button>

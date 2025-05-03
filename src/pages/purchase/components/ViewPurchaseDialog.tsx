@@ -19,6 +19,7 @@ import {
 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
+import { formatCurrency } from "../../../utils/formatCurrency"
 
 interface ViewPurchaseDialogProps {
   open: boolean
@@ -55,7 +56,7 @@ export function ViewPurchaseDialog({
               <Package className="h-5 w-5 text-gray-500 mt-1" />
               <div>
                 <h3 className="text-sm font-medium text-gray-500">Medicine</h3>
-                <p className="text-lg font-semibold">{purchase.medicine.name}</p>
+                <p className="text-lg font-semibold">{purchase.medicine.name} ({purchase.medicine.manufacturer.name})</p>
                 <div className="flex gap-2 mt-1">
                   <Badge variant="secondary">{purchase.medicine.manufacturer.name}</Badge>
                   <Badge variant="outline">{purchase.medicine.category.name}</Badge>
@@ -84,7 +85,7 @@ export function ViewPurchaseDialog({
               <DollarSign className="h-5 w-5 text-gray-500 mt-1" />
               <div>
                 <h3 className="text-sm font-medium text-gray-500">Cost Per Unit</h3>
-                <p className="text-lg font-semibold">${purchase.costPerUnit}</p>
+                <p className="text-lg font-semibold">{formatCurrency(purchase.costPerUnit)}</p>
               </div>
             </div>
 
@@ -93,7 +94,7 @@ export function ViewPurchaseDialog({
               <div>
                 <h3 className="text-sm font-medium text-gray-500">Total Cost</h3>
                 <p className="text-lg font-semibold">
-                  ${(parseFloat(purchase.costPerUnit) * purchase.quantity).toFixed(2)}
+                  {formatCurrency(parseFloat(purchase.costPerUnit) * purchase.quantity)}
                 </p>
               </div>
             </div>

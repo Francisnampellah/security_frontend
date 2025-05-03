@@ -17,6 +17,7 @@ import { ViewPurchaseDialog } from "./components/ViewPurchaseDialog"
 import { useState } from "react"
 import { AddPurchaseDialog } from "./components/AddPurchaseDialog"
 import { Purchase } from "../../type"
+import Header from '@/components/layout/header'
 
 export default function PurchasePage() {
   const {
@@ -36,6 +37,7 @@ export default function PurchasePage() {
   const [viewDialogOpen, setViewDialogOpen] = useState(false)
   const [selectedPurchase, setSelectedPurchase] = useState<Purchase | null>(null)
   const [editingPurchase, setEditingPurchase] = useState<Purchase | null>(null)
+  const [date, setDate] = useState<Date | undefined>(new Date())
 
   const handleEditPurchase = (purchase: Purchase) => {
     setEditingPurchase(purchase)
@@ -49,20 +51,9 @@ export default function PurchasePage() {
 
   return (
     <DashboardLayout>
+      <Header  setDate={setDate} date={date}/>
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          {/* <div className="flex items-center space-x-2">
-            <Input
-              placeholder="Search purchases..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-[300px]"
-            />
-            <Button variant="outline" size="icon">
-              <Search className="h-4 w-4" />
-            </Button>
-          </div> */}
-        </div>
+
 
         <PurchaseTable
           purchases={purchases}

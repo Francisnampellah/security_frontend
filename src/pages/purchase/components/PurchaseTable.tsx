@@ -33,6 +33,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
+import { formatCurrency } from "../../../utils/formatCurrency"
 
 interface PurchaseTableProps {
   purchases: Purchase[]
@@ -92,7 +93,7 @@ export function PurchaseTable({
       accessorKey: "costPerUnit",
       header: "Cost Per Unit",
       cell: ({ row }) => {
-        return row.getValue("costPerUnit")
+        return formatCurrency(row.getValue("costPerUnit") as string)
       },
     },
     {
@@ -100,7 +101,7 @@ export function PurchaseTable({
       header: "Total Cost",
       cell: ({ row }) => {
         const purchase = row.original
-        return (parseFloat(purchase.costPerUnit) * purchase.quantity).toFixed(2)
+        return formatCurrency(parseFloat(purchase.costPerUnit) * purchase.quantity)
       },
     },
     {
@@ -119,7 +120,7 @@ export function PurchaseTable({
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
+              <Button variant="outline" className="h-8 w-8 p-0 bg-white hover:bg-gray-100">
                 <span className="sr-only">Open menu</span>
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
@@ -239,23 +240,45 @@ export function PurchaseTable({
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-end space-x-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
-          Previous
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          Next
-        </Button>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <p className="text-sm text-muted-foreground">Rows per page</p>
+          <Select
+            value={`${table.getState().pagination.pageSize}`}
+            onValueChange={(value) => {
+              table.setPageSize(Number(value))
+            }}
+          >
+            <SelectTrigger className="h-8 w-[70px]">
+              <SelectValue placeholder={table.getState().pagination.pageSize} />
+            </SelectTrigger>
+            <SelectContent side="top">
+              {[10, 20, 30, 40, 50].map((pageSize) => (
+                <SelectItem key={pageSize} value={`${pageSize}`}>
+                  {pageSize}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            Previous
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            Next
+          </Button>
+        </div>
       </div>
     </div>
   )

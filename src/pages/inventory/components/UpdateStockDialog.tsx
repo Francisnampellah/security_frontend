@@ -170,24 +170,24 @@ export function UpdateStockDialog({ open, onOpenChange, medicine }: UpdateStockD
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[600px] space-y-6">
         <DialogHeader>
-          <DialogTitle>Update Stock</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-2xl font-bold">Update Stock</DialogTitle>
+          <DialogDescription className="text-muted-foreground">
             {medicine ? `Update stock for ${medicine.name}. Current stock: ${medicine.stock?.quantity || 0} units` : "Update stock in bulk"}
           </DialogDescription>
         </DialogHeader>
         
-        <Tabs defaultValue={medicine ? "single" : "bulk"} className="w-full" onValueChange={() => form.reset()}>
+        <Tabs defaultValue={medicine ? "single" : "bulk"} className="w-full space-y-6" onValueChange={() => form.reset()}>
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="single" disabled={!medicine}>Single Update</TabsTrigger>
             <TabsTrigger value="bulk">Bulk Update</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="single" className="mt-4">
+          <TabsContent value="single" className="space-y-6">
             {medicine && (
               <Form {...form}>
-                <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+                <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
                   <FormField
                     control={form.control}
                     name="batchId"
@@ -240,8 +240,7 @@ export function UpdateStockDialog({ open, onOpenChange, medicine }: UpdateStockD
                     )}
                   />
                   
-
-                  <DialogFooter>
+                  <DialogFooter className="flex justify-end space-x-2">
                     <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                       Cancel
                     </Button>
@@ -252,7 +251,7 @@ export function UpdateStockDialog({ open, onOpenChange, medicine }: UpdateStockD
             )}
           </TabsContent>
 
-          <TabsContent value="bulk" className="mt-4">
+          <TabsContent value="bulk" className="space-y-6">
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <Button
@@ -308,7 +307,7 @@ export function UpdateStockDialog({ open, onOpenChange, medicine }: UpdateStockD
                 </div>
               </div>
 
-              <DialogFooter>
+              <DialogFooter className="flex justify-end space-x-2">
                 <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                   Cancel
                 </Button>

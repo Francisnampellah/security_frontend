@@ -9,6 +9,7 @@ import { useSell } from "./hooks/useSell"
 import { useState } from "react"
 import { SellDialog } from "./components/SellDialog"
 import { Medicine, Sell } from "../../type"
+import Header from '@/components/layout/header'
 
 export default function SellPage() {
   const {
@@ -27,6 +28,8 @@ export default function SellPage() {
   } = useSell()
 
   const [selectedMedicine, setSelectedMedicine] = useState<Medicine | null>(null)
+  const [date, setDate] = useState<Date | undefined>(new Date())
+
 
   const handleOpenSellDialog = (medicine: Medicine) => {
     setSelectedMedicine(medicine)
@@ -39,8 +42,9 @@ export default function SellPage() {
 
   return (
     <DashboardLayout>
+      <Header Title='Sell Management' date={date} setDate={setDate}/>
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
+        {/* <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <Input
               placeholder="Search medicines..."
@@ -52,7 +56,7 @@ export default function SellPage() {
               <Search className="h-4 w-4" />
             </Button>
           </div>
-        </div>
+        </div> */}
         <SellTable
           sells={sells}
           isLoading={isLoading}
