@@ -8,7 +8,7 @@ import { SellTable } from "./components/SellTable"
 import { useSell } from "./hooks/useSell"
 import { useState } from "react"
 import { SellDialog } from "./components/SellDialog"
-import { Medicine } from "../../type"
+import { Medicine, Sell } from "../../type"
 
 export default function SellPage() {
   const {
@@ -33,6 +33,10 @@ export default function SellPage() {
     setSellDialogOpen(true)
   }
 
+  const handleView = (sell: Sell) => {
+    setSellDialogOpen(true)
+  }
+
   return (
     <DashboardLayout>
       <div className="space-y-4">
@@ -49,11 +53,10 @@ export default function SellPage() {
             </Button>
           </div>
         </div>
-
         <SellTable
           sells={sells}
           isLoading={isLoading}
-          onView={setSellDialogOpen}
+          onView={handleView}
           onsell={handleOpenSellDialog}
           isSelling={isSelling}
           sellingId={sellingId}

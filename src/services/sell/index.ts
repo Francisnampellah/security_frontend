@@ -18,7 +18,7 @@ export const createSell = async (sell: CreateSellRequest): Promise<Sell> => {
 
 export const getSells = async (): Promise<Sell[]> => {
   const response = await axiosInstance.get<Sell[]>('/sell/');
-  return response.data;
+  return response.data.sells;
 };
 
 export const getSellById = async (id: number): Promise<Sell> => {

@@ -19,8 +19,10 @@ import { useState } from "react"
 import { AddMedicineDialog } from "./components/AddMedicine"
 import { UpdateStockDialog } from "./components/UpdateStockDialog"
 import { Medicine } from "../../type"
+import Header from "@/components/layout/header"
 
 export default function InventoryPage() {
+  const [date, setDate] = useState<Date | undefined>(new Date())
   const {
     medicines,
     isLoading,
@@ -55,6 +57,7 @@ export default function InventoryPage() {
 
   return (
     <DashboardLayout>
+      <Header date={date} setDate={setDate} />
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">

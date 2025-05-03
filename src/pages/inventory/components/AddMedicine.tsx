@@ -180,6 +180,9 @@ export function AddMedicineDialog({ open, onOpenChange, onSubmit, medicine }: Ad
   }
 
   const handleDownloadTemplate = async () => {
+
+    console.log("Downloading template")
+    
     try {
       const blob = await getMedicineTemplate();
       const url = URL.createObjectURL(blob);

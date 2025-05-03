@@ -2,7 +2,7 @@ import React from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Dashboard from './pages/Dashboard';
 import UserManagement from './pages/UserManagement';
-import Inventory from './pages/inventory';
+import Inventory from './pages/inventory/index';
 import Purchase from './pages/purchase';
 import './App.css'
 import { AuthProvider } from './contexts/AuthContext';

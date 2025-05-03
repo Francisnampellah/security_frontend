@@ -30,16 +30,16 @@ export function useSell() {
     queryFn: getSells,
   })
 
-  if (isSellsError) {
-    showError("Failed to fetch sells", {
-      description: sellsQueryError instanceof Error ? sellsQueryError.message : "An unknown error occurred",
-    })
-  } else {
-    queryClient.invalidateQueries({ queryKey: ['sells'] })
-    success("Sells fetched successfully", {
-      description: "The sells have been successfully fetched.",
-    })
-  }
+  // if (isSellsError) {
+  //   showError("Failed to fetch sells", {
+  //     description: sellsQueryError instanceof Error ? sellsQueryError.message : "An unknown error occurred",
+  //   })
+  // } else {
+  //   queryClient.invalidateQueries({ queryKey: ['sells'] })
+  //   success("Sells fetched successfully", {
+  //     description: "The sells have been successfully fetched.",
+  //   })
+  // }
   
   // Sell mutation
   const sellMutation = useMutation({
