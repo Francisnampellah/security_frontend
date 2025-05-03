@@ -25,9 +25,9 @@ export const DashboardContent = () => {
   }
 
   return (
-    <>
+    <div className="space-y-4">
       {/* KPI Cards */}
-      <div className="mb-6 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card className="transform transition-all hover:-translate-y-1 hover:shadow-lg">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-lg font-medium">Total Revenue</CardTitle>
@@ -174,6 +174,6 @@ export const DashboardContent = () => {
           </CardContent>
         </Card>
       </div>
-    </>
+    </div>
   )
 } 

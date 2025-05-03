@@ -38,7 +38,7 @@ export default function UserManagement() {
   return (
     <DashboardLayout>
       <Header Title='User Management' date={date} setDate={setDate}/>
-      <div className="container mx-auto py-6">
+      <div className="container mx-auto ">
         <UserTable
           users={users}
           isLoading={isLoading}
