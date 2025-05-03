@@ -11,6 +11,8 @@ import LoginForm from './components/auth/LoginForm';
 import { Register } from './components/auth/Register';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { Toaster } from "sonner"
+import TransactionPage from "./pages/transaction"
+import ProfilePage from "./pages/profile"
 import Sell from './pages/sell';
 
 // import { AddMedicineDialog } from './components/pages/inventory/components/AddMedicine';
@@ -38,6 +40,9 @@ function App() {
               <Route path="/dashboard/inventory" element={<Inventory />} />
               <Route path="/dashboard/purchase" element={<Purchase />} />
               <Route path="/dashboard/sell" element={<Sell />} />
+              <Route path="/dashboard/transaction" element={<TransactionPage />} />
+              <Route path="/dashboard/profile" element={<ProfilePage />} />
+
               {/* <Route path="/dashboard/inventory/add" element={<AddMedicineDialog open={true} onOpenChange={() => {}} />} />
               <Route path="/dashboard/inventory/edit/:id" element={<AddMedicineDialog open={true} onOpenChange={() => {}} />} /> */}
             </Route>

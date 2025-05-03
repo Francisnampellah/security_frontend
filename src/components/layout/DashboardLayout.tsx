@@ -54,6 +54,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           icon: DollarSign,
           path: "/dashboard/sell",
         },
+        {
+          title: "Cash Flow",
+          icon: DollarSign,
+          path: "/dashboard/transaction",
+        },
      
 
       ],

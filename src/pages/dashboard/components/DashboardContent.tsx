@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useDashboard } from "../hooks/useDashboard"
 import { formatCurrency } from "../../../utils/formatCurrency"
+import StatisticsCard from '@/components/ui/StatisticsCard'
 
 export const DashboardContent = () => {
   const {
@@ -120,6 +121,46 @@ export const DashboardContent = () => {
             <p className="text-xs text-green-500">Total purchase value</p>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Cash Flow Cards */}
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
+        <StatisticsCard
+          title="Net Profit"
+          value={formatCurrency(totalRevenue - totalPurchases) + ' Tsh'}
+          percentage={totalRevenue - totalPurchases >= 0 ? '+12.5% from last month' : '-12.5% from last month'}
+          percentageColor={totalRevenue - totalPurchases >= 0 ? 'text-green-500' : 'text-red-500'}
+          chartData={[
+            { name: 'Mon', value: 1200 },
+            { name: 'Tue', value: 1300 },
+            { name: 'Wed', value: 1100 },
+            { name: 'Thu', value: 1400 },
+            { name: 'Fri', value: 1500 },
+            { name: 'Sat', value: 1700 },
+            { name: 'Sun', value: 1800 },
+          ]}
+          chartType="line"
+          chartColor="#000"
+          valueColor="text-black"
+        />
+        <StatisticsCard
+          title="Available Cash"
+          value={formatCurrency(totalRevenue - totalPurchases) + ' Tsh'}
+          percentage={totalRevenue - totalPurchases >= 0 ? '+8.1% from last month' : '-8.1% from last month'}
+          percentageColor={totalRevenue - totalPurchases >= 0 ? 'text-green-500' : 'text-red-500'}
+          chartData={[
+            { name: 'Mon', value: 900 },
+            { name: 'Tue', value: 950 },
+            { name: 'Wed', value: 1000 },
+            { name: 'Thu', value: 1100 },
+            { name: 'Fri', value: 1200 },
+            { name: 'Sat', value: 1300 },
+            { name: 'Sun', value: 1400 },
+          ]}
+          chartType="bar"
+          chartColor="#000"
+          valueColor="text-black"
+        />
       </div>
 
       {/* Main Content */}

@@ -6,6 +6,7 @@ import { EditUserDialog } from './components/EditUserDialog';
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import Header from '@/components/layout/header';
 import { useUsers } from './hooks/useUser';
+import { CreateUserDto, UpdateUserDto } from '../../types/user';
 
 export default function UserManagement() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -35,6 +36,14 @@ export default function UserManagement() {
     setIsCreateDialogOpen(true);
   };
 
+  const handleCreateUser = async (userData: CreateUserDto) => {
+    await createUser(userData);
+  };
+
+  const handleUpdateUser = async (params: { id: number; userData: UpdateUserDto }) => {
+    await updateUser(params);
+  };
+
   return (
     <DashboardLayout>
       <Header Title='User Management' date={date} setDate={setDate}/>
@@ -51,7 +60,7 @@ export default function UserManagement() {
         <CreateUserDialog
           open={isCreateDialogOpen}
           onOpenChange={setIsCreateDialogOpen}
-          onCreateUser={createUser}
+          onCreateUser={handleCreateUser}
         />
 
         {selectedUser && (
@@ -59,7 +68,7 @@ export default function UserManagement() {
             open={isEditDialogOpen}
             onOpenChange={setIsEditDialogOpen}
             user={selectedUser}
-            onUpdateUser={updateUser}
+            onUpdateUser={handleUpdateUser}
           />
         )}
       </div>

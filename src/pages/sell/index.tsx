@@ -3,12 +3,12 @@
 import { Search, Plus } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import DashboardLayout from '@/components/layout/DashboardLayout'
 import { SellTable } from "./components/SellTable"
 import { useSell } from "./hooks/useSell"
 import { useState } from "react"
 import { SellDialog } from "./components/SellDialog"
 import { Medicine, Sell } from "../../type"
+import DashboardLayout from '@/components/layout/DashboardLayout'
 import Header from '@/components/layout/header'
 
 export default function SellPage() {

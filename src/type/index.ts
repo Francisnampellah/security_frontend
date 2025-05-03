@@ -173,4 +173,59 @@ export interface Medicine {
       updatedAt: string;
     };
   }
+
+  export interface Transaction {
+    id: number;
+    referenceNumber: string;
+    type: 'SALE' | 'PURCHASE';
+    amount: number;
+    userId: number;
+    note?: string;
+    taxApplied?: number;
+    sellId?: number;
+    purchaseId?: number;
+    createdAt: string;
+    updatedAt: string;
+    user?: {
+      id: number;
+      name: string;
+      email: string;
+    };
+    sell?: {
+      id: number;
+      medicine: {
+        id: number;
+        name: string;
+      };
+      quantity: number;
+      totalPrice: number;
+    };
+    purchase?: {
+      id: number;
+      medicine: {
+        id: number;
+        name: string;
+      };
+      quantity: number;
+      costPerUnit: number;
+    };
+  }
+
+  export interface CreateTransactionData {
+    type: 'SALE' | 'PURCHASE';
+    amount: number;
+    note?: string;
+    taxApplied?: number;
+    sellId?: number;
+    purchaseId?: number;
+  }
+  
+  export interface GetTransactionsParams {
+    startDate?: string;
+    endDate?: string;
+    type?: 'SALE' | 'PURCHASE';
+    page?: number;
+    pageSize?: number;
+  }
+  
     
