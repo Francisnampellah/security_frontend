@@ -1,7 +1,7 @@
 import React from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Dashboard from './pages/dashboard/index';
-import UserManagement from './pages/UserManagement';
+import UserManagement from './pages/user';
 import Inventory from './pages/inventory/index';
 import Purchase from './pages/purchase';
 import './App.css'
@@ -12,6 +12,7 @@ import { Register } from './components/auth/Register';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { Toaster } from "sonner"
 import Sell from './pages/sell';
+
 // import { AddMedicineDialog } from './components/pages/inventory/components/AddMedicine';
 
 const queryClient = new QueryClient({

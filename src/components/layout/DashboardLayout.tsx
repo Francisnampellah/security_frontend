@@ -54,6 +54,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           icon: DollarSign,
           path: "/dashboard/sell",
         },
+     
+
       ],
     },
   ]

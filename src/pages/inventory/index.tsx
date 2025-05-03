@@ -57,7 +57,7 @@ export default function InventoryPage() {
 
   return (
     <DashboardLayout>
-      <Header date={date} setDate={setDate} />
+      <Header Title='Inventory Management' date={date} setDate={setDate} />
       <div className="">
           <InventoryTable
             handleAddMedicine={handleAddMedicine}

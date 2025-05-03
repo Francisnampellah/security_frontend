@@ -51,7 +51,7 @@ export default function PurchasePage() {
 
   return (
     <DashboardLayout>
-      <Header  setDate={setDate} date={date}/>
+      <Header Title='Purchase Management'  setDate={setDate} date={date}/>
       <div className="space-y-4">
 
 
