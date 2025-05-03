@@ -58,26 +58,9 @@ export default function InventoryPage() {
   return (
     <DashboardLayout>
       <Header date={date} setDate={setDate} />
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-          <Input
-            placeholder="Search medicines..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-[300px]"
-          />
-            <Button variant="outline" size="icon">
-            <Search className="h-4 w-4" />
-          </Button>
-        </div>
-          <Button onClick={handleAddMedicine}>
-            <Plus className="h-4 w-4 mr-2" />
-            Add Medicine
-          </Button>
-        </div>
-
+      <div className="">
           <InventoryTable
+            handleAddMedicine={handleAddMedicine}
             medicines={medicines}
             isLoading={isLoading}
             onDelete={handleDelete}

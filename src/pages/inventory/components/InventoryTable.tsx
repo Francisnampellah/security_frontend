@@ -33,6 +33,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
+import Header from "@/components/layout/header"
 
 interface InventoryTableProps {
   medicines: Medicine[]
@@ -43,6 +44,7 @@ interface InventoryTableProps {
   onEdit: (medicine: Medicine) => void
   isDeleting?: boolean
   deletingId?: number
+  handleAddMedicine: () => void
 }
 
 export function InventoryTable({
@@ -53,7 +55,8 @@ export function InventoryTable({
   onView,
   onEdit,
   isDeleting,
-  deletingId
+  deletingId,
+  handleAddMedicine
 }: InventoryTableProps) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -182,11 +185,9 @@ export function InventoryTable({
   })
 
   return (
-    <div className=" mx-auto mt-10">
+    <div className=" mx-auto mt-2">
       <div className="bg-white rounded-2xl shadow p-8">
         <div className="mb-6">
-          <h2 className="text-2xl font-bold mb-1">Inventory</h2>
-          <p className="text-muted-foreground mb-4">Here's a list of all medicines in your inventory.</p>
           <div className="flex flex-wrap items-center gap-2 mb-4">
             <Input
               placeholder="Filter medicines..."
@@ -199,6 +200,10 @@ export function InventoryTable({
             <div className="ml-auto">
               <Button variant="ghost" size="icon"><MoreHorizontal className="h-5 w-5" /></Button>
             </div>
+            <Button  onClick={handleAddMedicine}>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Medicine
+          </Button>
           </div>
         </div>
         <div className="rounded-lg border overflow-x-auto">
