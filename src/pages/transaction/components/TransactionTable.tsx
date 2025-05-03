@@ -120,32 +120,32 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
       accessorKey: "user.name",
       header: "User",
     },
-    {
-      id: "details",
-      header: "Details",
-      cell: ({ row }) => {
-        const transaction = row.original;
-        if (transaction.sell) {
-          return (
-            <div className="space-y-1">
-              <div>Medicine: {transaction.sell.medicine.name}</div>
-              <div>Quantity: {transaction.sell.quantity}</div>
-              <div>Total: {formatCurrency(transaction.sell.totalPrice)}</div>
-            </div>
-          );
-        }
-        if (transaction.purchase) {
-          return (
-            <div className="space-y-1">
-              <div>Medicine: {transaction.purchase.medicine.name}</div>
-              <div>Quantity: {transaction.purchase.quantity}</div>
-              <div>Cost/Unit: {formatCurrency(transaction.purchase.costPerUnit)}</div>
-            </div>
-          );
-        }
-        return '-';
-      },
-    },
+    // {
+    //   id: "details",
+    //   header: "Details",
+    //   cell: ({ row }) => {
+    //     const transaction = row.original;
+    //     if (transaction.sell) {
+    //       return (
+    //         <div className="space-y-1">
+    //           <div>Medicine: {transaction.sell.medicine.name}</div>
+    //           <div>Quantity: {transaction.sell.quantity}</div>
+    //           <div>Total: {formatCurrency(transaction.sell.totalPrice)}</div>
+    //         </div>
+    //       );
+    //     }
+    //     if (transaction.purchase) {
+    //       return (
+    //         <div className="space-y-1">
+    //           <div>Medicine: {transaction.purchase.medicine.name}</div>
+    //           <div>Quantity: {transaction.purchase.quantity}</div>
+    //           <div>Cost/Unit: {formatCurrency(transaction.purchase.costPerUnit)}</div>
+    //         </div>
+    //       );
+    //     }
+    //     return '-';
+    //   },
+    // },
     {
       id: "actions",
       cell: ({ row }) => {

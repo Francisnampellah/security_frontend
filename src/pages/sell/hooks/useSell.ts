@@ -46,6 +46,8 @@ export function useSell() {
     mutationFn: createSell,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['medicines'] })
+      queryClient.invalidateQueries({ queryKey: ['sells'] })
+      queryClient.invalidateQueries({ queryKey: ['transactions'] })
       success("Medicine sold", {
         description: "The medicine has been successfully sold.",
       })
