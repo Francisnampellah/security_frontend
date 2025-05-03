@@ -40,17 +40,17 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           path: "/dashboard/users",
         },
         {
-          title: "Inventory",
+          title: "Inventorys",
           icon: Package,
           path: "/dashboard/inventory",
         },
         {
-          title: "Purchase",
+          title: "Purchases",
           icon: ShoppingCart,
           path: "/dashboard/purchase",
         },
         {
-          title: "Sell",
+          title: "Sells",
           icon: Pill,
           path: "/dashboard/sell",
         },
