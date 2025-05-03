@@ -50,10 +50,10 @@ export function UpdateStockDialog({ open, onOpenChange, medicine }: UpdateStockD
 
   const createBatchMutation = useMutation({
     mutationFn: createBatch,
-    onSuccess: (newBatch) => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['batches'] })
       showSuccess("Batch created successfully")
-      setSelectedBatchId(newBatch.id.toString())
+      setSelectedBatchId(response.data.id.toString())
     },
     onError: (error) => {
       showError("Failed to create batch", {
@@ -64,13 +64,13 @@ export function UpdateStockDialog({ open, onOpenChange, medicine }: UpdateStockD
 
   const handleCreateBatch = async (inputValue: string) => {
     try {
-      const newBatch = await createBatchMutation.mutateAsync({
+      const response = await createBatchMutation.mutateAsync({
         note: inputValue,
         purchaseDate: new Date().toISOString()
       } as CreateBatchPayload)
       
       // Auto-select the newly created batch
-      form.setValue('batchId', newBatch.id.toString())
+      form.setValue('batchId', response.data.id.toString())
     } catch (error) {
       console.error("Error creating batch:", error)
     }
@@ -272,6 +272,7 @@ export function UpdateStockDialog({ open, onOpenChange, medicine }: UpdateStockD
                     options={batchOptions}
                     value={batchOptions.find(option => option.value === selectedBatchId)}
                     onChange={(option) => setSelectedBatchId(option?.value || "")}
+                    onCreateOption={handleCreateBatch}
                     placeholder="Select or create a batch"
                     className="w-full"
                     isLoading={isLoadingBatches}
