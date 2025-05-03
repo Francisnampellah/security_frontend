@@ -177,7 +177,7 @@ export interface Medicine {
   export interface Transaction {
     id: number;
     referenceNumber: string;
-    type: 'SALE' | 'PURCHASE';
+    type: 'SALE' | 'PURCHASE' | 'EXPENSE' | 'FINANCE';
     amount: number;
     userId: number;
     note?: string;
@@ -212,7 +212,7 @@ export interface Medicine {
   }
 
   export interface CreateTransactionData {
-    type: 'SALE' | 'PURCHASE';
+    type: 'SALE' | 'PURCHASE' | 'EXPENSE' | 'FINANCE';
     amount: number;
     note?: string;
     taxApplied?: number;
@@ -223,7 +223,7 @@ export interface Medicine {
   export interface GetTransactionsParams {
     startDate?: string;
     endDate?: string;
-    type?: 'SALE' | 'PURCHASE';
+    type?: 'SALE' | 'PURCHASE' | 'EXPENSE' | 'FINANCE';
     page?: number;
     pageSize?: number;
   }

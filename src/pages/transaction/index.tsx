@@ -5,8 +5,14 @@ import TransactionList from './components/TransactionTable';
 import TransactionFilters from './components/TransactionFilters';
 import DashboardLayout from '../../components/layout/DashboardLayout'
 import Header from '../../components/layout/header'
-import { formatCurrency } from '../../utils/format';
+import { formatCurrency } from '../../utils/formatCurrency';
 import StatisticsCard from '../../components/ui/StatisticsCard';
+
+interface Transaction {
+  type: 'SALE' | 'PURCHASE' | 'EXPENSE' | 'FINANCE';
+  amount: number;
+  // ... other transaction properties
+}
 
 const TransactionPage: React.FC = () => {
   const [filters, setFilters] = useState<any>({});

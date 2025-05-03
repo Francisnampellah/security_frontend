@@ -50,7 +50,11 @@ const AddTransactionForm: React.FC = () => {
 
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      await createTransaction(values);
+      await createTransaction({
+        type: values.type,
+        amount: values.amount,
+        note: values.note || "",
+      });
       form.reset();
       setOpen(false);
     } catch (error) {
