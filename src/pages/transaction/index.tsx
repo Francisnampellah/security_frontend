@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { useTransactions } from './hooks/useTransactions';
-import TransactionList from './components/TransactionTable';
+import TransactionTable from './components/TransactionTable';
 import TransactionFilters from './components/TransactionFilters';
 import DashboardLayout from '../../components/layout/DashboardLayout'
 import Header from '../../components/layout/header'
@@ -70,6 +70,11 @@ const TransactionPage: React.FC = () => {
       remainingCash
     };
   }, [transactions]);
+
+  const handleViewTransaction = (transaction: any) => {
+    // Implement view transaction logic here
+    console.log('View transaction:', transaction);
+  };
 
   return (
     <DashboardLayout>
@@ -174,10 +179,9 @@ const TransactionPage: React.FC = () => {
               <TransactionFilters
                 onFilter={handleFilter}
                 onReset={handleReset}
-                onAddTransaction={() => {}}
               />
               
-              <TransactionList
+              <TransactionTable
                 transactions={transactions}
                 loading={isLoading}
                 total={total}
@@ -185,7 +189,8 @@ const TransactionPage: React.FC = () => {
                 pageSize={pageSize}
                 onPageChange={handlePageChange}
                 onPageSizeChange={handlePageSizeChange}
-                onView={() => {}}
+                onView={handleViewTransaction}
+                filters={filters}
               />
             </div>
           </CardContent>

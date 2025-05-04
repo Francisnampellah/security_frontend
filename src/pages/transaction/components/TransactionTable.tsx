@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   Table,
   TableBody,
@@ -19,7 +19,6 @@ import {
   getPaginationRowModel,
   SortingState,
   getSortedRowModel,
-  ColumnFiltersState,
 } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,7 +28,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MoreHorizontal, View, Trash } from "lucide-react";
 import {
@@ -40,7 +38,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { AddTransactionForm } from '@/components/AddTransactionForm';
 import { useTransactions } from '../hooks/useTransactions';
 
 interface TransactionTableProps {
@@ -52,6 +49,11 @@ interface TransactionTableProps {
   onPageChange: (page: number) => void;
   onPageSizeChange: (pageSize: number) => void;
   onView: (transaction: any) => void;
+  filters: {
+    dateRange?: { from: Date; to: Date };
+    type?: string;
+    search?: string;
+  };
 }
 
 const TransactionTable: React.FC<TransactionTableProps> = ({
@@ -63,17 +65,54 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
   onPageChange,
   onPageSizeChange,
   onView,
+  filters,
 }) => {
   const { updateTransaction, deleteTransaction, isUpdating, isDeleting } = useTransactions();
-  const [editingId, setEditingId] = React.useState<number | null>(null);
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
-  const [globalFilter, setGlobalFilter] = React.useState("");
+
+  // Filter transactions based on the filters
+  const filteredTransactions = useMemo(() => {
+    return transactions.filter(transaction => {
+      // Filter by date range
+      if (filters.dateRange) {
+        const transactionDate = new Date(transaction.createdAt);
+        if (transactionDate < filters.dateRange.from || transactionDate > filters.dateRange.to) {
+          return false;
+        }
+      }
+
+      // Filter by type
+      if (filters.type && transaction.type !== filters.type) {
+        return false;
+      }
+
+      // Filter by search (reference number)
+      if (filters.search) {
+        const searchTerm = filters.search.toLowerCase();
+        if (!transaction.referenceNumber.toLowerCase().includes(searchTerm)) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [transactions, filters]);
+
+  // Calculate paginated transactions
+  const paginatedTransactions = useMemo(() => {
+    const startIndex = (page - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    return filteredTransactions.slice(startIndex, endIndex);
+  }, [filteredTransactions, page, pageSize]);
+
+  // Calculate total pages based on filtered transactions
+  const totalPages = useMemo(() => {
+    return Math.ceil(filteredTransactions.length / pageSize);
+  }, [filteredTransactions.length, pageSize]);
 
   const handleUpdate = async (id: number, data: any) => {
     try {
       await updateTransaction({ id, ...data });
-      setEditingId(null);
     } catch (error) {
       // Error is handled by the mutation
     }
@@ -120,32 +159,6 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
       accessorKey: "user.name",
       header: "User",
     },
-    // {
-    //   id: "details",
-    //   header: "Details",
-    //   cell: ({ row }) => {
-    //     const transaction = row.original;
-    //     if (transaction.sell) {
-    //       return (
-    //         <div className="space-y-1">
-    //           <div>Medicine: {transaction.sell.medicine.name}</div>
-    //           <div>Quantity: {transaction.sell.quantity}</div>
-    //           <div>Total: {formatCurrency(transaction.sell.totalPrice)}</div>
-    //         </div>
-    //       );
-    //     }
-    //     if (transaction.purchase) {
-    //       return (
-    //         <div className="space-y-1">
-    //           <div>Medicine: {transaction.purchase.medicine.name}</div>
-    //           <div>Quantity: {transaction.purchase.quantity}</div>
-    //           <div>Cost/Unit: {formatCurrency(transaction.purchase.costPerUnit)}</div>
-    //         </div>
-    //       );
-    //     }
-    //     return '-';
-    //   },
-    // },
     {
       id: "actions",
       cell: ({ row }) => {
@@ -160,9 +173,9 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem onClick={() => setEditingId(transaction.id)}>
+              <DropdownMenuItem onClick={() => onView(transaction)}>
                 <View className="mr-2 h-4 w-4" />
-                Edit
+                View
               </DropdownMenuItem>
               <DropdownMenuItem 
                 onClick={() => handleDelete(transaction.id)}
@@ -179,21 +192,17 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
   ];
 
   const table = useReactTable({
-    data: transactions,
+    data: paginatedTransactions,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
     state: {
       sorting,
-      columnFilters,
-      globalFilter,
     },
-    pageCount: Math.ceil(total / pageSize),
+    pageCount: totalPages,
     manualPagination: true,
-    meta: { onView },
   });
 
   if (loading) {
@@ -209,16 +218,6 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <Input
-            placeholder="Search all columns..."
-            value={globalFilter ?? ""}
-            onChange={(event) => setGlobalFilter(String(event.target.value))}
-            className="max-w-sm"
-          />
-        </div>
-      </div>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -270,7 +269,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
               <SelectValue placeholder={pageSize.toString()} />
             </SelectTrigger>
             <SelectContent side="top">
-              {[10, 20, 30, 40, 50].map((size) => (
+              {[5, 10, 20].map((size) => (
                 <SelectItem key={size} value={size.toString()}>
                   {size}
                 </SelectItem>
@@ -279,6 +278,9 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
           </Select>
         </div>
         <div className="flex items-center space-x-2">
+          <div className="text-sm text-muted-foreground">
+            Page {page} of {totalPages}
+          </div>
           <Button
             variant="outline"
             size="sm"
@@ -291,7 +293,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
             variant="outline"
             size="sm"
             onClick={() => onPageChange(page + 1)}
-            disabled={page >= Math.ceil(total / pageSize)}
+            disabled={page >= totalPages}
           >
             Next
           </Button>
