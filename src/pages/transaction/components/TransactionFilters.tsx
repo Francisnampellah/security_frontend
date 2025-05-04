@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
+import AddTransactionForm from './AddTransactionForm';
 
 const formSchema = z.object({
   dateRange: z.object({
@@ -60,6 +61,10 @@ const TransactionFilters: React.FC<TransactionFiltersProps> = ({ onFilter, onRes
 
   return (
     <div className="flex flex-col gap-4">
+      <div className="flex justify-between items-center">
+        <h2 className="text-lg font-semibold">Transactions</h2>
+        <AddTransactionForm />
+      </div>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <div className="flex flex-col md:flex-row gap-4">
