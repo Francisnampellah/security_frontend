@@ -34,11 +34,11 @@ const Header: React.FC<HeaderProps> = ({ date, setDate, Title = "POS SYSTEM" }) 
   const handleLogout = async () => {
     try {
       await AuthService.logout();
-      // navigate('/login');
+      navigate('/login');
     } catch (error) {
       console.error('Error during logout:', error);
       // Still navigate to login even if there's an error
-      // navigate('/login');
+      navigate('/login');
     }
   };
 
