@@ -53,7 +53,7 @@ export function UpdateStockDialog({ open, onOpenChange, medicine }: UpdateStockD
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ['batches'] })
       showSuccess("Batch created successfully")
-      setSelectedBatchId(response.data.id.toString())
+      setSelectedBatchId(response.id?.toString() || "")
     },
     onError: (error) => {
       showError("Failed to create batch", {
@@ -70,7 +70,9 @@ export function UpdateStockDialog({ open, onOpenChange, medicine }: UpdateStockD
       } as CreateBatchPayload)
       
       // Auto-select the newly created batch
-      form.setValue('batchId', response.data.id.toString())
+      if (response?.id) {
+        form.setValue('batchId', response.id.toString())
+      }
     } catch (error) {
       console.error("Error creating batch:", error)
     }
@@ -88,9 +90,9 @@ export function UpdateStockDialog({ open, onOpenChange, medicine }: UpdateStockD
   function handleSubmit(values: z.infer<typeof UpdateStockSchema>) {
     if (!medicine) return
 
-    const quantity = Number.parseInt(values.quantity)
-    const batchId = Number.parseInt(values.batchId)
-    const pricePerUnit = Number.parseFloat(values.pricePerUnit)
+    const quantity = Number.parseInt(values.quantity || "0")
+    const batchId = Number.parseInt(values.batchId || "0")
+    const pricePerUnit = Number.parseFloat(values.pricePerUnit || "0")
 
     handleUpdateStock({
       medicineId: medicine.id,
@@ -159,10 +161,10 @@ export function UpdateStockDialog({ open, onOpenChange, medicine }: UpdateStockD
   };
 
   // Convert batches to format required by react-select
-  const batchOptions = Array.isArray(batches?.data) 
-    ? batches.data.map((batch: any) => ({
-        value: batch.id.toString(),
-        label: `Batch #${batch.id} - ${new Date(batch.purchaseDate).toLocaleDateString()}`,
+  const batchOptions = Array.isArray(batches) 
+    ? batches.map((batch) => ({
+        value: batch.id?.toString() || "",
+        label: `Batch #${batch.id || ""} - ${new Date(batch.purchaseDate || new Date()).toLocaleDateString()}`,
       }))
     : [];
 

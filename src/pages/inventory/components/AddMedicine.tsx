@@ -55,11 +55,11 @@ export function AddMedicineDialog({ open, onOpenChange, onSubmit, medicine }: Ad
     if (medicine) {
       form.reset({
         name: medicine.name,
-        manufacturer: medicine.manufacturer.id.toString(),
-        unit: medicine.unit.id.toString(),
-        category: medicine.category.id.toString(),
-        sellPrice: medicine.sellPrice.toString(),
-        quantity: medicine.stock?.quantity.toString() || "0",
+        manufacturer: medicine.manufacturer?.id?.toString() || "",
+        unit: medicine.unit?.id?.toString() || "",
+        category: medicine.category?.id?.toString() || "",
+        sellPrice: medicine.sellPrice?.toString() || "",
+        quantity: medicine.stock?.quantity?.toString() || "0",
         dosage: medicine.dosage || "",
       })
     } else {
@@ -76,18 +76,17 @@ export function AddMedicineDialog({ open, onOpenChange, onSubmit, medicine }: Ad
   }, [medicine, form])
 
   // Convert data to format required by react-select
-  const manufacturerOptions = manufacturers.map((m) => ({ value: m.id.toString(), label: m.name }))
-  const categoryOptions = categories.map((c) => ({ value: c.id.toString(), label: c.name }))
-  const unitOptions = units.map((u) => ({ value: u.id.toString(), label: u.name }))
+  const manufacturerOptions = manufacturers?.map((m) => ({ value: m.id?.toString() || "", label: m.name || "" })) || []
+  const categoryOptions = categories?.map((c) => ({ value: c.id?.toString() || "", label: c.name || "" })) || []
+  const unitOptions = units?.map((u) => ({ value: u.id?.toString() || "", label: u.name || "" })) || []
 
   const handleCreateManufacturer = async (inputValue: string) => {
     try {
       const response = await addManufacturerMutation.mutateAsync({ name: inputValue });
-      const newManufacturer = response.manufacturer || response;
       // Update the query cache immediately with the new manufacturer
-      queryClient.setQueryData(['manufacturers'], (old: any) => [...(old || []), newManufacturer]);
+      queryClient.setQueryData(['manufacturers'], (old: any) => [...(old || []), response]);
       // Set the form value with the new manufacturer's ID
-      form.setValue("manufacturer", newManufacturer.id.toString());
+      form.setValue("manufacturer", response.id.toString());
     } catch (error) {
       console.error("Error creating manufacturer:", error);
     }
@@ -96,11 +95,10 @@ export function AddMedicineDialog({ open, onOpenChange, onSubmit, medicine }: Ad
   const handleCreateCategory = async (inputValue: string) => {
     try {
       const response = await addCategoryMutation.mutateAsync({ name: inputValue });
-      const newCategory = response.category || response;
       // Update the query cache immediately with the new category
-      queryClient.setQueryData(['categories'], (old: any) => [...(old || []), newCategory]);
+      queryClient.setQueryData(['categories'], (old: any) => [...(old || []), response]);
       // Set the form value with the new category's ID
-      form.setValue("category", newCategory.id.toString());
+      form.setValue("category", response.id.toString());
     } catch (error) {
       console.error("Error creating category:", error);
     }
@@ -109,11 +107,10 @@ export function AddMedicineDialog({ open, onOpenChange, onSubmit, medicine }: Ad
   const handleCreateUnit = async (inputValue: string) => {
     try {
       const response = await addUnitMutation.mutateAsync({ name: inputValue });
-      const newUnit = response.unit || response;
       // Update the query cache immediately with the new unit
-      queryClient.setQueryData(['units'], (old: any) => [...(old || []), newUnit]);
+      queryClient.setQueryData(['units'], (old: any) => [...(old || []), response]);
       // Set the form value with the new unit's ID
-      form.setValue("unit", newUnit.id.toString());
+      form.setValue("unit", response.id.toString());
     } catch (error) {
       console.error("Error creating unit:", error);
     }

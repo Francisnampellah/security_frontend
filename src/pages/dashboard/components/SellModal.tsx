@@ -15,7 +15,7 @@ interface SellModalProps {
 
 export const SellModal = ({ isOpen, onClose, medicine, onSubmit }: SellModalProps) => {
   const [quantity, setQuantity] = useState("")
-  const [price, setPrice] = useState<any>()
+  const [price, setPrice] = useState<number>(0)
 
   const {handleSell} = useSell()
 
@@ -25,17 +25,20 @@ export const SellModal = ({ isOpen, onClose, medicine, onSubmit }: SellModalProp
     handleSell({
       medicineId: medicine.id,
       quantity: Number(quantity),
-      totalPrice: price
+      totalPrice: price.toString()
     })
 
     onClose()
-
   }
 
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
     setQuantity(value)
-    setPrice(Number(value) * medicine.sellPrice)
+    const numericValue = Number(value)
+    const sellPrice = Number(medicine.sellPrice)
+    if (!isNaN(numericValue) && !isNaN(sellPrice)) {
+      setPrice(numericValue * sellPrice)
+    }
   }
 
   return (
@@ -72,7 +75,7 @@ export const SellModal = ({ isOpen, onClose, medicine, onSubmit }: SellModalProp
               min="0"
               step="0.01"
               value={price}
-              onChange={(e) => setPrice(e.target.value)}
+              onChange={(e) => setPrice(Number(e.target.value))}
               placeholder="Enter price"
               required
             />

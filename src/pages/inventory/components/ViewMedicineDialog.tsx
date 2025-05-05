@@ -1,8 +1,8 @@
 "use client"
 
 import { format } from "date-fns"
-import { Calendar, Package, Tag, Truck, Pill } from 'lucide-react'
-
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -10,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { Badge } from "@/components/ui/badge"
+import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Medicine } from "../../../type"
 
@@ -51,41 +51,27 @@ export function ViewMedicineDialog({ open, onOpenChange, medicine }: ViewMedicin
             View detailed information about this medicine
           </DialogDescription>
         </DialogHeader>
-
-        <div className="grid gap-6 py-4">
+        <div className="space-y-6">
           {/* Basic Information */}
           <div>
             <h3 className="text-lg font-medium">Basic Information</h3>
             <Separator className="my-2" />
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div className="flex items-center gap-2">
-                <Tag className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">Category:</span>
-                <span className="text-sm font-medium">{medicine.category.name}</span>
+              <div>
+                <Label>Manufacturer</Label>
+                <div className="text-sm">{medicine.manufacturer.name}</div>
               </div>
-              <div className="flex items-center gap-2">
-                <Truck className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">Manufacturer:</span>
-                <span className="text-sm font-medium">{medicine.manufacturer.name}</span>
+              <div>
+                <Label>Category</Label>
+                <div className="text-sm">{medicine.category.name}</div>
               </div>
-              <div className="flex items-center gap-2">
-                <Package className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">Unit:</span>
-                <span className="text-sm font-medium">{medicine.unit.name}</span>
+              <div>
+                <Label>Unit</Label>
+                <div className="text-sm">{medicine.unit.name}</div>
               </div>
-              {medicine.dosage && (
-                <div className="flex items-center gap-2">
-                  <Pill className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">Dosage:</span>
-                  <span className="text-sm font-medium">{medicine.dosage}</span>
-                </div>
-              )}
-              <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">Added on:</span>
-                <span className="text-sm font-medium">
-                  {format(new Date(medicine.createdAt), "MMM dd, yyyy")}
-                </span>
+              <div>
+                <Label>Dosage</Label>
+                <div className="text-sm">{medicine.dosage || "N/A"}</div>
               </div>
             </div>
           </div>
@@ -96,12 +82,11 @@ export function ViewMedicineDialog({ open, onOpenChange, medicine }: ViewMedicin
             <Separator className="my-2" />
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
-                <span className="text-sm text-muted-foreground">Selling Price:</span>
+                <Label>Selling Price</Label>
                 <div className="text-2xl font-bold">
                   ${Number.parseFloat(medicine.sellPrice).toFixed(2)}
                 </div>
               </div>
-              {/* Additional pricing information can be added here */}
             </div>
           </div>
 
@@ -111,12 +96,12 @@ export function ViewMedicineDialog({ open, onOpenChange, medicine }: ViewMedicin
             <Separator className="my-2" />
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
-                <span className="text-sm text-muted-foreground">Current Stock:</span>
+                <Label>Current Stock</Label>
                 <div className="text-2xl font-bold">{medicine.stock?.quantity ?? 0} units</div>
                 <div className="mt-1">{getStockStatus(medicine.stock?.quantity ?? 0)}</div>
               </div>
               <div>
-                <span className="text-sm text-muted-foreground">Last Updated:</span>
+                <Label>Last Updated</Label>
                 <div className="text-sm font-medium">
                   {format(new Date(medicine.stock?.updatedAt ?? medicine.updatedAt), "MMM dd, yyyy 'at' h:mm a")}
                 </div>
@@ -128,25 +113,26 @@ export function ViewMedicineDialog({ open, onOpenChange, medicine }: ViewMedicin
           <div>
             <h3 className="text-lg font-medium">System Information</h3>
             <Separator className="my-2" />
-            <div className="grid grid-cols-1 gap-2">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Medicine ID:</span>
-                <span className="text-sm font-mono">{medicine.id}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Created At:</span>
-                <span className="text-sm">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div>
+                <Label>Created At</Label>
+                <div className="text-sm">
                   {format(new Date(medicine.createdAt), "MMM dd, yyyy 'at' h:mm a")}
-                </span>
+                </div>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Last Updated:</span>
-                <span className="text-sm">
+              <div>
+                <Label>Last Updated</Label>
+                <div className="text-sm">
                   {format(new Date(medicine.updatedAt), "MMM dd, yyyy 'at' h:mm a")}
-                </span>
+                </div>
               </div>
             </div>
           </div>
+        </div>
+        <div className="mt-6 flex justify-end">
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Close
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
