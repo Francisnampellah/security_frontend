@@ -42,5 +42,6 @@ export const bulkUpdateStock = async (formData: FormData) => {
 
 export const fetchBatches = async () => {
   const response = await axiosInstance.get('/batch');
+  console.log(response.data);
   return response.data;
 };

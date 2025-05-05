@@ -3,6 +3,7 @@ import { Batch } from "../../type";
 
 export const fetchBatches = async (): Promise<Batch[]> => {
   const response = await axiosInstance.get<Batch[]>('/batch/');
+  console.log(response.data);
   return response.data;
 };
 
@@ -24,5 +25,5 @@ export const deleteBatch = async (id: number): Promise<void> => {
 
 export const getBatchById = async (id: number): Promise<Batch> => {
   const response = await axiosInstance.get<Batch>(`/batch/${id}`);
-  return response.data;
+  return response.data.data;
 };

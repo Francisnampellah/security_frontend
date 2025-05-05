@@ -161,8 +161,8 @@ export function UpdateStockDialog({ open, onOpenChange, medicine }: UpdateStockD
   };
 
   // Convert batches to format required by react-select
-  const batchOptions = Array.isArray(batches) 
-    ? batches.map((batch) => ({
+  const batchOptions = Array.isArray(batches.data) 
+    ? batches.data.map((batch) => ({
         value: batch.id?.toString() || "",
         label: `Batch #${batch.id || ""} - ${new Date(batch.purchaseDate || new Date()).toLocaleDateString()}`,
       }))
