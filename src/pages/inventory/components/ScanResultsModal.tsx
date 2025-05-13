@@ -1,10 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Button } from "@/components/ui/button"
-import { Download } from "lucide-react"
 import { ScanAlert } from "@/type"
-import jsPDF from "jspdf"
 
 interface ScanResultsModalProps {
   isOpen: boolean
@@ -26,117 +23,11 @@ export function ScanResultsModal({ isOpen, onOpenChange, alerts }: ScanResultsMo
     }
   }
 
-  const generatePDF = () => {
-    const doc = new jsPDF()
-    const pageWidth = doc.internal.pageSize.getWidth()
-    const margin = 20
-    let yOffset = 20
-
-    // Add title
-    doc.setFontSize(20)
-    doc.text("Security Scan Report", pageWidth / 2, yOffset, { align: "center" })
-    yOffset += 20
-
-    // Add timestamp
-    doc.setFontSize(12)
-    doc.text(`Generated on: ${new Date().toLocaleString()}`, pageWidth / 2, yOffset, { align: "center" })
-    yOffset += 20
-
-    // Add summary
-    doc.setFontSize(14)
-    doc.text("Summary", margin, yOffset)
-    yOffset += 10
-    doc.setFontSize(12)
-    doc.text(`Total Alerts: ${alerts.length}`, margin, yOffset)
-    yOffset += 10
-    doc.text(`High Risk: ${alerts.filter(a => a.risk.toLowerCase() === 'high').length}`, margin, yOffset)
-    yOffset += 10
-    doc.text(`Medium Risk: ${alerts.filter(a => a.risk.toLowerCase() === 'medium').length}`, margin, yOffset)
-    yOffset += 10
-    doc.text(`Low Risk: ${alerts.filter(a => a.risk.toLowerCase() === 'low').length}`, margin, yOffset)
-    yOffset += 20
-
-    // Add detailed findings
-    doc.setFontSize(14)
-    doc.text("Detailed Findings", margin, yOffset)
-    yOffset += 20
-
-    alerts.forEach((alert, index) => {
-      // Check if we need a new page
-      if (yOffset > doc.internal.pageSize.getHeight() - 40) {
-        doc.addPage()
-        yOffset = 20
-      }
-
-      // Add alert title and risk
-      doc.setFontSize(14)
-      doc.setTextColor(0, 0, 0)
-      doc.text(`${index + 1}. ${alert.name}`, margin, yOffset)
-      yOffset += 10
-
-      // Add risk level
-      doc.setFontSize(12)
-      const riskColor = getRiskColor(alert.risk)
-      doc.setTextColor(riskColor === 'destructive' ? 220 : riskColor === 'default' ? 0 : 100)
-      doc.text(`Risk Level: ${alert.risk}`, margin, yOffset)
-      doc.setTextColor(0, 0, 0)
-      yOffset += 10
-
-      // Add description
-      doc.setFontSize(12)
-      const descriptionLines = doc.splitTextToSize(alert.description, pageWidth - 2 * margin)
-      doc.text(descriptionLines, margin, yOffset)
-      yOffset += descriptionLines.length * 7 + 10
-
-      // Add details
-      doc.setFontSize(11)
-      doc.text(`URL: ${alert.url}`, margin, yOffset)
-      yOffset += 7
-      doc.text(`Method: ${alert.method}`, margin, yOffset)
-      yOffset += 7
-      doc.text(`Confidence: ${alert.confidence}`, margin, yOffset)
-      yOffset += 7
-      doc.text(`CWE ID: ${alert.cweid}`, margin, yOffset)
-      yOffset += 10
-
-      // Add solution
-      doc.setFontSize(12)
-      doc.text("Solution:", margin, yOffset)
-      yOffset += 7
-      const solutionLines = doc.splitTextToSize(alert.solution, pageWidth - 2 * margin)
-      doc.text(solutionLines, margin, yOffset)
-      yOffset += solutionLines.length * 7 + 10
-
-      // Add references if available
-      if (alert.reference) {
-        doc.text("References:", margin, yOffset)
-        yOffset += 7
-        const referenceLines = doc.splitTextToSize(alert.reference, pageWidth - 2 * margin)
-        doc.text(referenceLines, margin, yOffset)
-        yOffset += referenceLines.length * 7 + 10
-      }
-
-      yOffset += 10
-    })
-
-    // Save the PDF
-    doc.save("security-scan-report.pdf")
-  }
-
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[80vh]">
-        <DialogHeader className="flex flex-row items-center justify-between">
+        <DialogHeader>
           <DialogTitle>Scan Results</DialogTitle>
-          <Button
-            variant="outline"
-            size="sm"
-            className="gap-2"
-            onClick={generatePDF}
-          >
-            <Download className="h-4 w-4" />
-            Download PDF
-          </Button>
         </DialogHeader>
         <ScrollArea className="h-[60vh] pr-4">
           <div className="space-y-4">
