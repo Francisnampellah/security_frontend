@@ -12,7 +12,6 @@ export const Register = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    name: '',
   });
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -22,8 +21,7 @@ export const Register = () => {
     try {
       await AuthService.register(
         formData.email,
-        formData.password,
-        formData.name
+        formData.password
       );
       navigate('/login');
     } catch (err: any) {
@@ -48,15 +46,7 @@ export const Register = () => {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
-              <Input
-                id="name"
-                value={formData.name}
-                onChange={(e) => setFormData({...formData, name: e.target.value})}
-                required
-              />
-            </div>
+
 
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>

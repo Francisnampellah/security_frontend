@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Medicine } from "@/type"
-import { useSell } from "../hooks/useMedicineSell"
 
 interface SellModalProps {
   isOpen: boolean
@@ -17,16 +16,15 @@ export const SellModal = ({ isOpen, onClose, medicine, onSubmit }: SellModalProp
   const [quantity, setQuantity] = useState("")
   const [price, setPrice] = useState<number>(0)
 
-  const {handleSell} = useSell()
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
-    handleSell({
-      medicineId: medicine.id,
-      quantity: Number(quantity),
-      totalPrice: price.toString()
-    })
+    // handleSell({
+    //   medicineId: medicine.id,
+    //   quantity: Number(quantity),
+    //   totalPrice: price.toString()
+    // })
 
     onClose()
   }

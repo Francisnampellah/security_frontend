@@ -1,100 +1,97 @@
-"use client"
-
-import { Download, FileUp, Filter, Plus, Search, SlidersHorizontal, View, Pencil, Trash2 } from 'lucide-react'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent } from "@/components/ui/card"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { SummaryCards } from "./components/SummaryCards"
-import { InventoryTable } from "./components/InventoryTable"
-import { useInventory } from "./hooks/useInventory"
-import DashboardLayout from '@/components/layout/DashboardLayout'
-import { ViewMedicineDialog } from "./components/ViewMedicineDialog"
 import { useState } from "react"
-import { AddMedicineDialog } from "./components/AddMedicine"
-import { UpdateStockDialog } from "./components/UpdateStockDialog"
-import { Medicine } from "../../type"
-import Header from "@/components/layout/header"
+import { useScanSessions } from "./hooks/useScanSessions"
+import { ScanTable } from "./components/ScanTable"
+import { Button } from "@/components/ui/button"
+import { Plus } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { useForm } from "react-hook-form"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
+import DashboardLayout from "@/components/layout/DashboardLayout"
 
-export default function InventoryPage() {
-  const [date, setDate] = useState<Date | undefined>(new Date())
-  const {
-    medicines,
-    isLoading,
-    isError,
-    error,
-    searchTerm,
-    setSearchTerm,
-    addDialogOpen,
-    setAddDialogOpen,
-    handleDelete,
-    openUpdateStockDialog,
-    isDeleting,
-    deletingId,
-    updateStockDialogOpen,
-    setUpdateStockDialogOpen,
-    selectedMedicine,
-    setSelectedMedicine,
-  } = useInventory()
+interface CreateScanSessionForm {
+  url: string
+}
 
-  const [viewDialogOpen, setViewDialogOpen] = useState(false)
-  const [editingMedicine, setEditingMedicine] = useState<Medicine | null>(null)
+export default function ScanSessionsPage() {
+  const { scanSessions, isLoading, createSession } = useScanSessions()
+  const [open, setOpen] = useState(false)
 
-  const handleEditMedicine = (medicine: Medicine) => {
-    setEditingMedicine(medicine)
-    setAddDialogOpen(true)
-  }
 
-  const handleAddMedicine = () => {
-    setEditingMedicine(null)
-    setAddDialogOpen(true)
+  console.log(scanSessions)
+
+  const form = useForm<CreateScanSessionForm>({
+    defaultValues: {
+      url: "",
+    },
+  })
+
+  const onSubmit = (data: CreateScanSessionForm) => {
+    createSession.mutate(data.url, {
+      onSuccess: () => {
+        setOpen(false)
+        form.reset()
+      },
+    })
   }
 
   return (
     <DashboardLayout>
-      <Header Title='Inventory Management' date={date} setDate={setDate} />
-      <div className="">
-          <InventoryTable
-            handleAddMedicine={handleAddMedicine}
-            medicines={medicines}
-            isLoading={isLoading}
-            onDelete={handleDelete}
-            onUpdateStock={openUpdateStockDialog}
-          onView={(medicine) => {
-            setSelectedMedicine(medicine)
-            setViewDialogOpen(true)
-          }}
-          onEdit={handleEditMedicine}
-            isDeleting={isDeleting}
-            deletingId={deletingId}
-          />
+    <div className="container mx-auto py-10">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-2xl font-bold">Scan Sessions</h1>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              New Scan Session
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Create New Scan Session</DialogTitle>
+            </DialogHeader>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="url"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>URL</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="https://example.com"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button type="submit" className="w-full">
+                  Create Session
+                </Button>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
+      </div>
 
-      <AddMedicineDialog
-          open={addDialogOpen}
-          onOpenChange={(open) => {
-            setAddDialogOpen(open)
-            if (!open) setEditingMedicine(null)
-          }}
-          medicine={editingMedicine}
-          onSubmit={() => setEditingMedicine(null)}
-      />
-
-      <UpdateStockDialog
-        open={updateStockDialogOpen}
-        onOpenChange={setUpdateStockDialogOpen}
-        medicine={selectedMedicine}
-      />
-
-        <ViewMedicineDialog
-          open={viewDialogOpen}
-          onOpenChange={setViewDialogOpen}
-          medicine={selectedMedicine}
-        />
+      <ScanTable data={scanSessions} isLoading={isLoading} />
     </div>
     </DashboardLayout>
   )

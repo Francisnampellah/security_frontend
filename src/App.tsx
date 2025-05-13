@@ -2,8 +2,7 @@ import React from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Dashboard from './pages/dashboard/index';
 import UserManagement from './pages/user';
-import Inventory from './pages/inventory/index';
-import Purchase from './pages/purchase';
+import ScanSessionsPage from './pages/inventory';
 import './App.css'
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -11,8 +10,7 @@ import LoginForm from './components/auth/LoginForm';
 import { Register } from './components/auth/Register';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { Toaster } from "sonner"
-import TransactionPage from "./pages/transaction/index"
-import Sell from './pages/sell';
+
 
 // import { AddMedicineDialog } from './components/pages/inventory/components/AddMedicine';
 
@@ -36,10 +34,8 @@ function App() {
             <Route element={<ProtectedRoute />}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/dashboard/users" element={<UserManagement />} />
-              <Route path="/dashboard/inventory" element={<Inventory />} />
-              <Route path="/dashboard/purchase" element={<Purchase />} />
-              <Route path="/dashboard/sell" element={<Sell />} />
-              <Route path="/dashboard/transaction" element={<TransactionPage />} />
+              <Route path="/dashboard/inventory" element={<ScanSessionsPage />} />
+
 
               {/* <Route path="/dashboard/inventory/add" element={<AddMedicineDialog open={true} onOpenChange={() => {}} />} />
               <Route path="/dashboard/inventory/edit/:id" element={<AddMedicineDialog open={true} onOpenChange={() => {}} />} /> */}

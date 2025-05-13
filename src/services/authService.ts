@@ -22,11 +22,10 @@ export const AuthService = {
     localStorage.removeItem('refreshToken');
   },
 
-  async register(email: string, password: string, name: string) {
+  async register(email: string, password: string) {
     const response = await axiosInstance.post(`/auth/register`, {
       email,
-      password,
-      name
+      password
     });
     return response.data;
   },

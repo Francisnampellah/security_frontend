@@ -228,4 +228,43 @@ export interface Medicine {
     pageSize?: number;
   }
   
+export interface ScanSession {
+  id: number;
+  url: string;
+  spiderId: string;
+  activeId: string | null;
+  spiderStatus: number;
+  activeStatus: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ScanAlert {
+  sourceid: string
+  other: string
+  method: string
+  evidence: string
+  pluginId: string
+  cweid: string
+  confidence: string
+  sourceMessageId: number
+  wascid: string
+  description: string
+  messageId: string
+  inputVector: string
+  url: string
+  tags: {
+    [key: string]: string
+  }
+  reference: string
+  solution: string
+  alert: string
+  param: string
+  attack: string
+  name: string
+  risk: string
+  id: string
+  alertRef: string
+}
+  
     

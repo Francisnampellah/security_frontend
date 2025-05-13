@@ -40,26 +40,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           path: "/dashboard/users",
         },
         {
-          title: "Inventorys",
+          title: "Scan Sessions",
           icon: Package,
           path: "/dashboard/inventory",
         },
-        {
-          title: "Purchases",
-          icon: ShoppingCart,
-          path: "/dashboard/purchase",
-        },
-        {
-          title: "Sells",
-          icon: Pill,
-          path: "/dashboard/sell",
-        },
-        {
-          title: "Cash Flow",
-          icon: DollarSign,
-          path: "/dashboard/transaction",
-        },
-     
+      
 
       ],
     },
@@ -71,7 +56,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         <Sidebar>
           <SidebarHeader>
             <div className="p-4">
-              <h1 className="text-2xl font-bold">NonaFamasi</h1>
+              <h1 className="text-2xl font-bold">Security System</h1>
             </div>
           </SidebarHeader>
           <SidebarContent>

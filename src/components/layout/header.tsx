@@ -25,10 +25,10 @@ const Header: React.FC<HeaderProps> = ({ date, setDate, Title = "POS SYSTEM" }) 
   const navigate = useNavigate();
   const profile = {
     id: 2,
-    email: "Bnampellah1@gmail.com",
-    name: "Nampellah",
-    role: "PHARMACIST",
-    image: "https://ui-avatars.com/api/?name=Nampellah&background=0D8ABC&color=fff"
+    email: "Someone@gmail.com",
+    name: "Someone",
+    role: "Security Analyst",
+    image: "https://ui-avatars.com/api/?name=Someone&background=0D8ABC&color=fff"
   };
 
   const handleLogout = async () => {
