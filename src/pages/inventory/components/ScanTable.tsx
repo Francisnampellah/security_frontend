@@ -34,18 +34,19 @@ export function ScanTable({ data, isLoading }: ScanTableProps) {
 
   useEffect(() => {
     if (data?.scanSessions) {
-      data.scanSessions.forEach((session: ScanSession) => {
-        if (session.spiderStatus === 100 && session.activeStatus === 0) {
-          // If spider scan is complete but active scan hasn't started, trigger active scan
-          handleStartActiveScan(session)
-        } else if (session.spiderStatus === 100 && session.activeStatus > 0 && session.activeStatus < 100) {
-          // If spider scan is complete and active scan is in progress, refresh active scan status
-          updateActiveScanStatus.mutate(session.activeId.toString())
-        } else if (session.spiderStatus < 100) {
-          // If spider scan is in progress, refresh spider scan status
-          updateSpiderScanStatus.mutate(session.spiderId.toString())
-        }
-      })
+      const refreshInterval = setInterval(() => {
+        data.scanSessions.forEach((session: ScanSession) => {
+          if (session.spiderStatus < 100) {
+            // Refresh spider scan status if not complete
+            updateSpiderScanStatus.mutate(session.spiderId.toString())
+          } else if (session.activeStatus > 0 && session.activeStatus < 100) {
+            // Refresh active scan status if in progress
+            updateActiveScanStatus.mutate(session.activeId.toString())
+          }
+        })
+      }, 5000) // Refresh every 5 seconds
+
+      return () => clearInterval(refreshInterval)
     }
   }, [data?.scanSessions])
 
