@@ -36,11 +36,13 @@ export function ScanTable({ data, isLoading }: ScanTableProps) {
     if (data?.scanSessions) {
       const refreshInterval = setInterval(() => {
         data.scanSessions.forEach((session: ScanSession) => {
+          // Refresh spider scan if not complete
           if (session.spiderStatus < 100) {
-            // Refresh spider scan status if not complete
             updateSpiderScanStatus.mutate(session.spiderId.toString())
-          } else if (session.activeStatus > 0 && session.activeStatus < 100) {
-            // Refresh active scan status if in progress
+          }
+          
+          // Refresh active scan if it exists and is not complete
+          if (session.activeId && session.activeStatus < 100) {
             updateActiveScanStatus.mutate(session.activeId.toString())
           }
         })
@@ -48,7 +50,7 @@ export function ScanTable({ data, isLoading }: ScanTableProps) {
 
       return () => clearInterval(refreshInterval)
     }
-  }, [data?.scanSessions])
+  }, [data?.scanSessions, updateSpiderScanStatus, updateActiveScanStatus])
 
   if (isLoading) {
     return (
