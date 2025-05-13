@@ -1,6 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { fetchScanSessions, createScanSession, deleteScanSession } from "@/services/inventory"
-import { getSpiderScanStatus, getActiveScanStatus, startActiveScan, getAlerts as fetchAlerts } from "@/services/scan"
+import { getSpiderScanStatus, getActiveScanStatus, startActiveScan, getAlerts as fetchAlerts,fetchScanSessions, createScanSession, deleteScanSession } from "@/services/scan"
 import { ScanSession, ScanAlert } from "@/type"
 import { toast } from "sonner"
 

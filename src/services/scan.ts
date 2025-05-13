@@ -1,5 +1,6 @@
 import axiosInstance from '@/lib/axiosInstance';
 import { ScanAlert } from '@/type';
+import { Medicine, ScanSession } from "../type"
 
 export const scan = async (url: string) => {
   const response = await axiosInstance.post("/scan/spider/start", { url });
@@ -35,6 +36,25 @@ export const getScanResults = async (scanId: string) => {
   const response = await axiosInstance.get(`/api/zap/spider/scan/${scanId}`);
   return response.data;
 };
+
+export const fetchScanSessions = async (): Promise<ScanSession[]> => {
+  const response = await axiosInstance.get<ScanSession[]>('/scan/scan-sessions')
+  return response.data
+}
+
+export const createScanSession = async (url: string): Promise<ScanSession> => {
+  const response = await axiosInstance.post<ScanSession>('/scan-sessions', { url })
+  return response.data
+}
+
+export const getScanSession = async (id: number): Promise<ScanSession> => {
+  const response = await axiosInstance.get<ScanSession>(`/scan-sessions/${id}`)
+  return response.data
+}
+
+export const deleteScanSession = async (id: number): Promise<void> => {
+  await axiosInstance.delete(`/scan-sessions/${id}`)
+}
 
 
 

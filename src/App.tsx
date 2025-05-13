@@ -1,7 +1,6 @@
 import React from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Dashboard from './pages/dashboard/index';
-import UserManagement from './pages/user';
 import ScanSessionsPage from './pages/inventory';
 import './App.css'
 import { AuthProvider } from './contexts/AuthContext';
@@ -33,7 +32,6 @@ function App() {
 
             <Route element={<ProtectedRoute />}>
               <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/dashboard/users" element={<UserManagement />} />
               <Route path="/dashboard/inventory" element={<ScanSessionsPage />} />
 
 

@@ -4,14 +4,12 @@ import { useState,useEffect } from "react"
 import DashboardLayout from "@/components/layout/DashboardLayout"
 import Header from "@/components/layout/header"
 import { SearchBar } from "./components/SearchBar"
-import { SearchResults } from "./components/SearchResults"
-import { DashboardContent } from "./components/DashboardContent"
-import { useMedicineSearch } from "./hooks/useMedicineSearch"
 import { getAllScanSessions } from "@/services/scan"
+import { VulnerabilitySummary } from "./components/vurnabilitysummary"
+import { VulnerabilityTests } from "./components/test"
 
 export default function DashboardPage() {
   const [date, setDate] = useState<Date | undefined>(new Date())
-  const { searchQuery, isSearching, filteredMedicines, handleSearch } = useMedicineSearch()
   const [scanSessions, setScanSessions] = useState<any[]>([])
 
   useEffect(() => {
@@ -36,11 +34,8 @@ export default function DashboardPage() {
         <main className="flex-1">
           <div className="container mx-auto px-4 py-6">
             <SearchBar  />
-            {isSearching ? (
-              <SearchResults medicines={filteredMedicines} onSell={handleSell} />
-            ) : (
-              <DashboardContent />
-            )}
+            <VulnerabilitySummary />
+            <VulnerabilityTests/>
           </div>
         </main>
       </div>
