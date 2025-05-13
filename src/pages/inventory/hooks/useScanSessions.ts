@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { getSpiderScanStatus, getActiveScanStatus, startActiveScan, getAlerts as fetchAlerts,fetchScanSessions, createScanSession, deleteScanSession } from "@/services/scan"
+import { getSpiderScanStatus, getActiveScanStatus, startActiveScan, getAlerts as fetchAlerts,fetchScanSessions, createScanSession, deleteScanSession,scan } from "@/services/scan"
 import { ScanSession, ScanAlert } from "@/type"
 import { toast } from "sonner"
 
@@ -11,7 +11,17 @@ export const useScanSessions = () => {
     queryFn: fetchScanSessions,
   })
 
-  
+
+  const startSpiderScan = useMutation({
+    mutationFn: (url: string) => scan(url),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["scanSessions"] })
+    },
+    onError: (error) => {
+      toast.error("Failed to start spider scan")
+      console.error(error)
+    },
+  })
 
   const startActiveScan = useMutation({
     mutationFn: (url: string) => startActiveScan(url),
@@ -19,6 +29,18 @@ export const useScanSessions = () => {
       queryClient.invalidateQueries({ queryKey: ["scanSessions"] })
     },
   })
+
+  const CreateScanSession = useMutation({
+    mutationFn: (sessionId: string) => createScanSession(sessionId), 
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["scanSessions"] })
+    },
+    onError: (error) => {
+      toast.error("Failed to get scan session")
+      console.error(error)
+    },
+  })
+
 
   const updateSpiderScanStatus = useMutation({
     mutationFn: (spiderId: string) => getSpiderScanStatus(spiderId),
@@ -86,5 +108,6 @@ export const useScanSessions = () => {
     updateActiveScanStatus,
     startActiveScan,
     getAlerts,
+    startSpiderScan
   }
 } 

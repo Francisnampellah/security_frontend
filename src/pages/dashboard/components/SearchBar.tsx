@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { useState } from "react"
 import axios from "axios"
 import { scan } from "@/services/scan"
-
+import { useScanSessions } from "@/pages/inventory/hooks/useScanSessions"
 // interface SearchBarProps {
 //   onScanStart?: (scanId: string, sessionId: string) => void
 // }
@@ -13,13 +13,15 @@ export const SearchBar = () => {
   const [url, setUrl] = useState("")
   const [isLoading, setIsLoading] = useState(false)
 
+  const { updateSpiderScanStatus,startSpiderScan} = useScanSessions()
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!url) return
 
     setIsLoading(true)
     try {
-      const response = await scan(url)
+      const response = await startSpiderScan.mutate(url)
       console.log(response)
       setUrl("")
     } catch (error) {

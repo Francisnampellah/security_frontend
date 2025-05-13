@@ -33,10 +33,6 @@ function App() {
             <Route element={<ProtectedRoute />}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/dashboard/inventory" element={<ScanSessionsPage />} />
-
-
-              {/* <Route path="/dashboard/inventory/add" element={<AddMedicineDialog open={true} onOpenChange={() => {}} />} />
-              <Route path="/dashboard/inventory/edit/:id" element={<AddMedicineDialog open={true} onOpenChange={() => {}} />} /> */}
             </Route>
             
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
