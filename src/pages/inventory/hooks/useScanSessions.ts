@@ -1,25 +1,26 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { getSpiderScanStatus, getActiveScanStatus, startActiveScan, getAlerts as fetchAlerts,fetchScanSessions, createScanSession, deleteScanSession,scan } from "@/services/scan"
 import { ScanSession, ScanAlert } from "@/type"
-import { toast } from "sonner"
+import { useNotification } from "@/hooks/useNotification"
 
 export const useScanSessions = () => {
   const queryClient = useQueryClient()
+  const { success, error: showError } = useNotification()
 
   const { data: scanSessions = [], isLoading } = useQuery<ScanSession[]>({
     queryKey: ["scanSessions"],
     queryFn: fetchScanSessions,
   })
 
-
   const startSpiderScan = useMutation({
     mutationFn: (url: string) => scan(url),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["scanSessions"] })
+      success("Spider scan started successfully")
     },
-    onError: (error) => {
-      toast.error("Failed to start spider scan")
-      console.error(error)
+    onError: (err) => {
+      showError("Failed to start spider scan")
+      console.error(err)
     },
   })
 
@@ -27,6 +28,11 @@ export const useScanSessions = () => {
     mutationFn: (url: string) => startActiveScan(url),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["scanSessions"] })
+      success("Active scan started successfully")
+    },
+    onError: (err) => {
+      showError("Failed to start active scan")
+      console.error(err)
     },
   })
 
@@ -34,22 +40,23 @@ export const useScanSessions = () => {
     mutationFn: (sessionId: string) => createScanSession(sessionId), 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["scanSessions"] })
+      success("Scan session created successfully")
     },
-    onError: (error) => {
-      toast.error("Failed to get scan session")
-      console.error(error)
+    onError: (err) => {
+      showError("Failed to create scan session")
+      console.error(err)
     },
   })
-
 
   const updateSpiderScanStatus = useMutation({
     mutationFn: (spiderId: string) => getSpiderScanStatus(spiderId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["scanSessions"] })
+      // success("Spider scan status updated")
     },
-    onError: (error) => {
-      toast.error("Failed to update spider scan status")
-      console.error(error)
+    onError: (err) => {
+      showError("Failed to update spider scan status")
+      console.error(err)
     },
   })
 
@@ -57,10 +64,11 @@ export const useScanSessions = () => {
     mutationFn: (activeId: string) => getActiveScanStatus(activeId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["scanSessions"] })
+      // success("Active scan status updated")
     },
-    onError: (error) => {
-      toast.error("Failed to update active scan status")
-      console.error(error)
+    onError: (err) => {
+      showError("Failed to update active scan status")
+      console.error(err)
     },
   })
 
@@ -68,11 +76,11 @@ export const useScanSessions = () => {
     mutationFn: createScanSession,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["scanSessions"] })
-      toast.success("Scan session created successfully")
+      success("Scan session created successfully")
     },
-    onError: (error) => {
-      toast.error("Failed to create scan session")
-      console.error(error)
+    onError: (err) => {
+      showError("Failed to create scan session")
+      console.error(err)
     },
   })
 
@@ -80,11 +88,11 @@ export const useScanSessions = () => {
     mutationFn: deleteScanSession,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["scanSessions"] })
-      toast.success("Scan session deleted successfully")
+      success("Scan session deleted successfully")
     },
-    onError: (error) => {
-      toast.error("Failed to delete scan session")
-      console.error(error)
+    onError: (err) => {
+      showError("Failed to delete scan session")
+      console.error(err)
     },
   })
 
@@ -92,10 +100,11 @@ export const useScanSessions = () => {
     mutationFn: fetchAlerts,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["scanSessions"] })
+      success("Alerts retrieved successfully")
     },
-    onError: (error) => {
-      toast.error("Failed to get alerts")
-      console.error(error)
+    onError: (err) => {
+      showError("Failed to get alerts")
+      console.error(err)
     },
   })
 
