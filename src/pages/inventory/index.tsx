@@ -53,7 +53,7 @@ export default function ScanSessionsPage() {
     <div className="container mx-auto py-10">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-2xl font-bold">Scan Sessions</h1>
-        <Dialog open={open} onOpenChange={setOpen}>
+        {/* <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
             <Button>
               <Plus className="mr-2 h-4 w-4" />
@@ -88,7 +88,7 @@ export default function ScanSessionsPage() {
               </form>
             </Form>
           </DialogContent>
-        </Dialog>
+        </Dialog> */}
       </div>
 
       <ScanTable data={scanSessions} isLoading={isLoading} />

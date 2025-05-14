@@ -87,8 +87,15 @@ export function ScanTable({ data, isLoading }: ScanTableProps) {
   }
 
   const handleStartActiveScan = async (session: ScanSession) => {
-    console.log(session)
-    await startActiveScan(session.url)
+    try {
+      await startActiveScan(session.url)
+      // Add a small delay to ensure the scan has started
+      setTimeout(() => {
+        window.location.reload()
+      }, 1000)
+    } catch (error) {
+      console.error('Failed to start active scan:', error)
+    }
   }
 
   const handleRefreshScan = (session: ScanSession) => {
