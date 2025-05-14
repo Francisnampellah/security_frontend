@@ -1,9 +1,7 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import { Lock, Zap, BarChart3 } from "lucide-react";
+import { Zap, BarChart3, Lock, FileText, Shield } from "lucide-react";
 
-export function Home() {
-  const navigate = useNavigate();
+export default function Features() {
   return (
     <div className="flex flex-col min-h-screen bg-[#f8fbff]">
       {/* Navbar */}
@@ -14,94 +12,49 @@ export function Home() {
         <div className="hidden md:flex items-center space-x-8 text-sm font-medium text-gray-700">
           <a href="/" className="hover:text-blue-600 transition">Home</a>
           <a href="/about" className="hover:text-blue-600 transition">About</a>
-          <a href="/features" className="hover:text-blue-600 transition">Features</a>
+          <a href="/features" className="hover:text-blue-600 transition text-blue-600">Features</a>
           <a href="/contact" className="hover:text-blue-600 transition">Contact</a>
         </div>
-        <button
-          className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-md text-sm shadow"
-          onClick={() => navigate("/login")}
-        >
-          Get Started
-        </button>
+        <a href="/login" className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-md text-sm shadow">Get Started</a>
       </nav>
 
-      {/* Hero Section */}
-      <section className="flex flex-col items-center justify-center text-center py-20 px-4 bg-gradient-to-b from-[#eaf3fb] to-[#f8fbff]">
-        <h1 className="text-3xl md:text-5xl font-bold mb-2 text-gray-900">
-          Protect Your Network with Real-Time
-        </h1>
-        <h2 className="text-3xl md:text-5xl font-bold mb-4 text-blue-500">
-          Vulnerability Assessments
-        </h2>
-        <p className="text-gray-600 max-w-xl mx-auto mb-8">
-          Dynamic scanning, user-friendly dashboards, and actionable insights tailored for SMEs.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <button
-            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-6 py-2 rounded-md shadow"
-            onClick={() => navigate("/login")}
-          >
-            Get Started
-          </button>
-          <button
-            className="bg-white border border-blue-500 text-blue-500 hover:bg-blue-50 font-semibold px-6 py-2 rounded-md shadow"
-            onClick={() => navigate("/about")}
-          >
-            Learn More
-          </button>
+      <main className="flex-1 w-full max-w-5xl mx-auto px-4 py-16">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold mb-4 text-gray-900">Features</h1>
+          <p className="text-lg text-gray-500 max-w-2xl mx-auto">
+            Discover the powerful features that make VulnGuard the ideal solution for real-time vulnerability management.
+          </p>
         </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-16 px-4 bg-white">
-        <h3 className="text-2xl md:text-3xl font-bold text-center mb-10 text-gray-900">
-          Comprehensive Security Features
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 max-w-5xl mx-auto">
-          <div className="bg-[#f8fbff] border border-blue-100 rounded-xl p-6 flex flex-col items-center text-center shadow-sm">
-            <div className="bg-blue-50 rounded-full p-3 mb-3">
-              <Zap className="text-blue-500 w-7 h-7" />
-            </div>
-            <h4 className="font-semibold text-lg mb-1">Real-Time Scanning</h4>
-            <p className="text-gray-500 text-sm">Continuous monitoring and instant vulnerability detection</p>
+        <div className="grid md:grid-cols-2 gap-8 mb-12">
+          <div className="bg-white rounded-xl shadow p-8 flex flex-col items-center text-center">
+            <Zap className="w-10 h-10 text-blue-500 mb-3" />
+            <h2 className="text-xl font-semibold mb-2 text-gray-900">Real-Time Scanning</h2>
+            <p className="text-gray-500">Continuous monitoring and instant detection of vulnerabilities across your network and applications.</p>
           </div>
-          <div className="bg-[#f8fbff] border border-blue-100 rounded-xl p-6 flex flex-col items-center text-center shadow-sm">
-            <div className="bg-blue-50 rounded-full p-3 mb-3">
-              <BarChart3 className="text-blue-500 w-7 h-7" />
-            </div>
-            <h4 className="font-semibold text-lg mb-1">User-Friendly Dashboards</h4>
-            <p className="text-gray-500 text-sm">Clear visualizations and actionable insights at a glance</p>
-          </div>
-          <div className="bg-[#f8fbff] border border-blue-100 rounded-xl p-6 flex flex-col items-center text-center shadow-sm">
-            <div className="bg-blue-50 rounded-full p-3 mb-3">
-              <Zap className="text-blue-500 w-7 h-7" />
-            </div>
-            <h4 className="font-semibold text-lg mb-1">Plug-and-Play Setup</h4>
-            <p className="text-gray-500 text-sm">Get started in minutes with our simple integration process</p>
-          </div>
-          <div className="bg-[#f8fbff] border border-blue-100 rounded-xl p-6 flex flex-col items-center text-center shadow-sm">
-            <div className="bg-blue-50 rounded-full p-3 mb-3">
-              <Lock className="text-blue-500 w-7 h-7" />
-            </div>
-            <h4 className="font-semibold text-lg mb-1">Actionable Reports</h4>
-            <p className="text-gray-500 text-sm">Detailed analysis and step-by-step remediation guidance</p>
+          <div className="bg-white rounded-xl shadow p-8 flex flex-col items-center text-center">
+            <BarChart3 className="w-10 h-10 text-blue-500 mb-3" />
+            <h2 className="text-xl font-semibold mb-2 text-gray-900">User-Friendly Dashboards</h2>
+            <p className="text-gray-500">Clear visualizations and actionable insights at a glance, making security management simple.</p>
           </div>
         </div>
-      </section>
-
-      {/* Call to Action Section */}
-      <section className="py-16 px-4 bg-[#f8fbff] text-center">
-        <h3 className="text-2xl md:text-3xl font-bold mb-6 text-gray-900">
-          Ready to Secure Your Network?
-        </h3>
-        <button
-          className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-8 py-3 rounded-md shadow"
-          onClick={() => navigate("/login")}
-        >
-          Get Started Now
-        </button>
-      </section>
-
+        <div className="grid md:grid-cols-3 gap-8 mb-12">
+          <div className="bg-white rounded-xl shadow p-8 flex flex-col items-center text-center">
+            <Lock className="w-10 h-10 text-blue-500 mb-3" />
+            <h2 className="text-xl font-semibold mb-2 text-gray-900">Secure & Reliable</h2>
+            <p className="text-gray-500">Enterprise-grade security with regular updates and dedicated support for your needs.</p>
+          </div>
+          <div className="bg-white rounded-xl shadow p-8 flex flex-col items-center text-center">
+            <FileText className="w-10 h-10 text-blue-500 mb-3" />
+            <h2 className="text-xl font-semibold mb-2 text-gray-900">Actionable Reports</h2>
+            <p className="text-gray-500">Detailed analysis and step-by-step remediation guidance for every vulnerability found.</p>
+          </div>
+          <div className="bg-white rounded-xl shadow p-8 flex flex-col items-center text-center">
+            <Shield className="w-10 h-10 text-blue-500 mb-3" />
+            <h2 className="text-xl font-semibold mb-2 text-gray-900">Plug-and-Play Setup</h2>
+            <p className="text-gray-500">Get started in minutes with our simple integration process and intuitive interface.</p>
+          </div>
+        </div>
+      </main>
       {/* Footer */}
       <footer className="bg-white border-t border-blue-100/60 py-10 px-4 md:px-12 mt-auto">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center md:items-start gap-8">

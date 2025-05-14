@@ -1,9 +1,19 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import { Lock, Zap, BarChart3 } from "lucide-react";
+import React, { useState } from "react";
+import { Mail, Phone, MapPin } from "lucide-react";
 
-export function Home() {
-  const navigate = useNavigate();
+export default function Contact() {
+  const [form, setForm] = useState({ name: "", email: "", message: "" });
+  const [submitted, setSubmitted] = useState(false);
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  }
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setSubmitted(true);
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-[#f8fbff]">
       {/* Navbar */}
@@ -15,93 +25,51 @@ export function Home() {
           <a href="/" className="hover:text-blue-600 transition">Home</a>
           <a href="/about" className="hover:text-blue-600 transition">About</a>
           <a href="/features" className="hover:text-blue-600 transition">Features</a>
-          <a href="/contact" className="hover:text-blue-600 transition">Contact</a>
+          <a href="/contact" className="hover:text-blue-600 transition text-blue-600">Contact</a>
         </div>
-        <button
-          className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-md text-sm shadow"
-          onClick={() => navigate("/login")}
-        >
-          Get Started
-        </button>
+        <a href="/login" className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-md text-sm shadow">Get Started</a>
       </nav>
 
-      {/* Hero Section */}
-      <section className="flex flex-col items-center justify-center text-center py-20 px-4 bg-gradient-to-b from-[#eaf3fb] to-[#f8fbff]">
-        <h1 className="text-3xl md:text-5xl font-bold mb-2 text-gray-900">
-          Protect Your Network with Real-Time
-        </h1>
-        <h2 className="text-3xl md:text-5xl font-bold mb-4 text-blue-500">
-          Vulnerability Assessments
-        </h2>
-        <p className="text-gray-600 max-w-xl mx-auto mb-8">
-          Dynamic scanning, user-friendly dashboards, and actionable insights tailored for SMEs.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <button
-            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-6 py-2 rounded-md shadow"
-            onClick={() => navigate("/login")}
-          >
-            Get Started
-          </button>
-          <button
-            className="bg-white border border-blue-500 text-blue-500 hover:bg-blue-50 font-semibold px-6 py-2 rounded-md shadow"
-            onClick={() => navigate("/about")}
-          >
-            Learn More
-          </button>
+      <main className="flex-1 w-full max-w-3xl mx-auto px-4 py-16">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold mb-4 text-gray-900">Contact Us</h1>
+          <p className="text-lg text-gray-500 max-w-2xl mx-auto">
+            Have a question or need support? Reach out to our team and we'll get back to you as soon as possible.
+          </p>
         </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-16 px-4 bg-white">
-        <h3 className="text-2xl md:text-3xl font-bold text-center mb-10 text-gray-900">
-          Comprehensive Security Features
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 max-w-5xl mx-auto">
-          <div className="bg-[#f8fbff] border border-blue-100 rounded-xl p-6 flex flex-col items-center text-center shadow-sm">
-            <div className="bg-blue-50 rounded-full p-3 mb-3">
-              <Zap className="text-blue-500 w-7 h-7" />
-            </div>
-            <h4 className="font-semibold text-lg mb-1">Real-Time Scanning</h4>
-            <p className="text-gray-500 text-sm">Continuous monitoring and instant vulnerability detection</p>
+        <div className="grid md:grid-cols-2 gap-8">
+          <div className="bg-white rounded-xl shadow p-8">
+            <h2 className="text-xl font-semibold mb-4 text-blue-600 flex items-center"><Mail className="w-5 h-5 mr-2" /> Send a Message</h2>
+            {submitted ? (
+              <div className="text-green-600 font-medium text-center py-8">Thank you for contacting us! We'll be in touch soon.</div>
+            ) : (
+              <form className="space-y-4" onSubmit={handleSubmit}>
+                <div>
+                  <label className="block text-base font-medium text-gray-700 mb-1">Name</label>
+                  <input name="name" value={form.name} onChange={handleChange} required className="w-full px-4 py-3 border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 text-base" />
+                </div>
+                <div>
+                  <label className="block text-base font-medium text-gray-700 mb-1">Email</label>
+                  <input name="email" type="email" value={form.email} onChange={handleChange} required className="w-full px-4 py-3 border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 text-base" />
+                </div>
+                <div>
+                  <label className="block text-base font-medium text-gray-700 mb-1">Message</label>
+                  <textarea name="message" value={form.message} onChange={handleChange} required rows={4} className="w-full px-4 py-3 border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 text-base" />
+                </div>
+                <button type="submit" className="w-full bg-[#42a5ea] hover:bg-[#2196f3] text-white font-semibold py-3 rounded-md transition text-base">Send Message</button>
+              </form>
+            )}
           </div>
-          <div className="bg-[#f8fbff] border border-blue-100 rounded-xl p-6 flex flex-col items-center text-center shadow-sm">
-            <div className="bg-blue-50 rounded-full p-3 mb-3">
-              <BarChart3 className="text-blue-500 w-7 h-7" />
-            </div>
-            <h4 className="font-semibold text-lg mb-1">User-Friendly Dashboards</h4>
-            <p className="text-gray-500 text-sm">Clear visualizations and actionable insights at a glance</p>
-          </div>
-          <div className="bg-[#f8fbff] border border-blue-100 rounded-xl p-6 flex flex-col items-center text-center shadow-sm">
-            <div className="bg-blue-50 rounded-full p-3 mb-3">
-              <Zap className="text-blue-500 w-7 h-7" />
-            </div>
-            <h4 className="font-semibold text-lg mb-1">Plug-and-Play Setup</h4>
-            <p className="text-gray-500 text-sm">Get started in minutes with our simple integration process</p>
-          </div>
-          <div className="bg-[#f8fbff] border border-blue-100 rounded-xl p-6 flex flex-col items-center text-center shadow-sm">
-            <div className="bg-blue-50 rounded-full p-3 mb-3">
-              <Lock className="text-blue-500 w-7 h-7" />
-            </div>
-            <h4 className="font-semibold text-lg mb-1">Actionable Reports</h4>
-            <p className="text-gray-500 text-sm">Detailed analysis and step-by-step remediation guidance</p>
+          <div className="bg-white rounded-xl shadow p-8 flex flex-col justify-center">
+            <h2 className="text-xl font-semibold mb-4 text-blue-600 flex items-center"><Phone className="w-5 h-5 mr-2" /> Contact Info</h2>
+            <ul className="text-gray-500 text-sm space-y-4">
+              <li className="flex items-center"><Mail className="w-5 h-5 mr-2 text-blue-500" /> support@vulnguard.com</li>
+              <li className="flex items-center"><Phone className="w-5 h-5 mr-2 text-blue-500" /> +1 (555) 123-4567</li>
+              <li className="flex items-center"><MapPin className="w-5 h-5 mr-2 text-blue-500" /> 123 Security Ave, Suite 100, Cyber City</li>
+            </ul>
           </div>
         </div>
-      </section>
-
-      {/* Call to Action Section */}
-      <section className="py-16 px-4 bg-[#f8fbff] text-center">
-        <h3 className="text-2xl md:text-3xl font-bold mb-6 text-gray-900">
-          Ready to Secure Your Network?
-        </h3>
-        <button
-          className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-8 py-3 rounded-md shadow"
-          onClick={() => navigate("/login")}
-        >
-          Get Started Now
-        </button>
-      </section>
-
+      </main>
       {/* Footer */}
       <footer className="bg-white border-t border-blue-100/60 py-10 px-4 md:px-12 mt-auto">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center md:items-start gap-8">

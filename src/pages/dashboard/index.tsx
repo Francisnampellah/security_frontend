@@ -31,13 +31,13 @@ export default function DashboardPage() {
   return (
     <DashboardLayout>
       <Header date={date} setDate={setDate} />
-      <div className="flex min-h-screen w-full flex-col">
+      <div className="flex w-full flex-col">
         <main className="flex-1">
           <div className="container mx-auto px-4 py-6">
-            <ScanningHelp />
             <ScanInput />
-            <VulnerabilitySummary />
-            <VulnerabilityTests/>
+            <ScanningHelp />
+            {/* <VulnerabilitySummary />
+            <VulnerabilityTests/> */}
           </div>
         </main>
       </div>

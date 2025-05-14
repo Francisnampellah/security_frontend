@@ -11,6 +11,8 @@ import { Register } from './components/auth/Register';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { Toaster } from "sonner"
 import About from '@/pages/About';
+import Features from '@/pages/Features';
+import Contact from '@/pages/Contact';
 
 
 // import { AddMedicineDialog } from './components/pages/inventory/components/AddMedicine';
@@ -25,6 +27,8 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
+            <Route path="/features" element={<Features />} />
+            <Route path="/contact" element={<Contact />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/inventory" element={<ScanSessionsPage />} />
             <Route path="/login" element={<LoginForm />} />
