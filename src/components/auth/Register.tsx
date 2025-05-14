@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthService } from '../../services/authService';
-import { Shield } from "lucide-react";
+import { Eye, Loader2, Shield } from "lucide-react";
+import { useNotification } from '@/hooks/useNotification';
+
 
 export const Register = () => {
   const navigate = useNavigate();
@@ -11,17 +13,24 @@ export const Register = () => {
   });
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const { success, error: notificationError } = useNotification();
 
   const handleSubmit = async (e: React.FormEvent) => {
+    setLoading(true);
     e.preventDefault();
     try {
       await AuthService.register(
         formData.email,
         formData.password
       );
+      setLoading(false);
+      success('Registration successful');
       navigate('/login');
     } catch (err: any) {
+      notificationError(err.response?.data?.message || 'Registration failed');
       setError(err.response?.data?.message || 'Registration failed');
+      setLoading(false);
     }
   };
 
@@ -63,7 +72,13 @@ export const Register = () => {
             type="submit"
             className="w-full bg-[#42a5ea] hover:bg-[#2196f3] text-white font-semibold py-3 rounded-md transition text-base"
           >
-            Create Account
+           {loading ? ( 
+                                <div className="flex items-center justify-center">
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                                </div>
+                              ) : (
+                                "Create Account"
+                              )}
           </button>
           <div className="text-center text-base text-gray-600 pt-2">
             Already have an account?{' '}

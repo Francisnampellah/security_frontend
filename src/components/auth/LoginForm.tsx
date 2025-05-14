@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { Shield } from "lucide-react";
+import { Loader2 } from "lucide-react";
+
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
@@ -9,14 +11,17 @@ const LoginForm = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const { login } = useAuth();
-
+  const [loading, setLoading] = useState(false);
   const handleSubmit = async (e: React.FormEvent) => {
+    setLoading(true);
     e.preventDefault();
     try {
       await login(email, password);
+      setLoading(false);
       navigate('/dashboard');
     } catch (err: any) {
       setError(err.message || 'Failed to login');
+      setLoading(false);
     }
   };
 
@@ -58,7 +63,13 @@ const LoginForm = () => {
             type="submit"
             className="w-full bg-[#42a5ea] hover:bg-[#2196f3] text-white font-semibold py-3 rounded-md transition text-base"
           >
-            Login
+            {loading ? (
+              <div className="flex items-center justify-center">
+                <Loader2 className="h-4 w-4 animate-spin" />
+              </div>
+            ) : (
+              "Login"
+            )}
           </button>
           <div className="text-center text-base text-gray-600 pt-2">
             Don't have an account?{' '}
