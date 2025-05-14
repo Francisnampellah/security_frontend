@@ -80,11 +80,12 @@ export const Register = () => {
                                 "Create Account"
                               )}
           </button>
+ 
           <div className="text-center text-base text-gray-600 pt-2">
             Already have an account?{' '}
-            <button type="button" className="text-blue-500 hover:underline font-medium" onClick={() => navigate('/login')}>
+            <a href='/login' type="button" className="text-blue-500 hover:underline font-medium">
               Sign in
-            </button>
+            </a>
           </div>
         </form>
       </div>

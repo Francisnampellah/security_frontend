@@ -71,11 +71,18 @@ const LoginForm = () => {
               "Login"
             )}
           </button>
+          <button
+            type="button"
+            onClick={() => navigate('/')}
+            className="w-full border text-white border-gray-300 text-gray-700 font-semibold py-3 rounded-md transition text-base"
+          >
+            Back to Home
+          </button>
           <div className="text-center text-base text-gray-600 pt-2">
             Don't have an account?{' '}
-            <button type="button" className="text-blue-500 hover:underline font-medium" onClick={() => navigate('/register')}>
+            <a href='/register' type="button" className="text-blue-500 hover:underline font-medium">
               Sign up
-            </button>
+            </a>
           </div>
         </form>
       </div>
