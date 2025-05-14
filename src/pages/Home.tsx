@@ -19,7 +19,7 @@ export function Home() {
         {/* Animated Gradient Border */}
         <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-blue-500/20 animate-gradient-x" />
 
-        <div className="container mx-auto px-4 py-32 relative">
+        <div className="container mx-auto px-4 py-20 relative">
           <div className="text-center space-y-8 max-w-4xl mx-auto">
             {/* Logo and Badge */}
             <div className="flex items-center justify-center space-x-3 mb-8">
@@ -46,7 +46,7 @@ export function Home() {
             </div>
 
             {/* CTA Buttons */}
-            <div className="flex gap-4 justify-center pt-4">
+            <div className="flex items-center justify-center gap-4">
               <Button 
                 size="lg" 
                 onClick={() => navigate("/login")} 
@@ -58,10 +58,10 @@ export function Home() {
               <Button 
                 size="lg" 
                 variant="outline" 
-                onClick={() => navigate("/login")}
+                onClick={() => navigate("/about")}
                 className="border-blue-500/20 text-blue-100 hover:bg-blue-500/10"
               >
-                Learn More
+                About Us
               </Button>
             </div>
 

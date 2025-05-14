@@ -1,6 +1,6 @@
 import { ScanSession, ScanAlert } from "@/type"
 import { Button } from "@/components/ui/button"
-import { MoreHorizontal, RefreshCw, Play, Eye, Shield } from "lucide-react"
+import { MoreHorizontal, RefreshCw, Play, Eye, Shield, Loader2 } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,6 +33,7 @@ export function ScanTable({ data, isLoading }: ScanTableProps) {
   const { createSession, scanSessions, updateSpiderScanStatus, updateActiveScanStatus, getAlerts } = useScanSessions()
   const [isResultsModalOpen, setIsResultsModalOpen] = useState(false)
   const [currentAlerts, setCurrentAlerts] = useState<ScanAlert[]>([])
+  const [loadingAlerts, setLoadingAlerts] = useState<string | null>(null)
 
   useEffect(() => {
     if (data?.scanSessions) {
@@ -66,6 +67,7 @@ export function ScanTable({ data, isLoading }: ScanTableProps) {
   }
 
   const handleGetAlerts = async (session: ScanSession) => {
+    setLoadingAlerts(session.id.toString())
     try {
       const result = await getAlerts.mutateAsync(session.url)
       const uniqueAlerts = result.reduce((acc: ScanAlert[], current: ScanAlert) => {
@@ -85,6 +87,8 @@ export function ScanTable({ data, isLoading }: ScanTableProps) {
       setIsResultsModalOpen(true)
     } catch (error) {
       console.error('Failed to get alerts:', error)
+    } finally {
+      setLoadingAlerts(null)
     }
   }
 
@@ -148,6 +152,7 @@ export function ScanTable({ data, isLoading }: ScanTableProps) {
                   const showRefresh = !isSpiderComplete || !isActiveComplete
                   const showActiveScan = isSpiderComplete && session.activeStatus === 0
                   const showViewResult = isSpiderComplete && isActiveComplete
+                  const isLoading = loadingAlerts === session.id.toString()
 
                   return (
                     <TableRow key={session.id} className="group">
@@ -199,8 +204,13 @@ export function ScanTable({ data, isLoading }: ScanTableProps) {
                               size="sm"
                               className="h-8 w-8 p-0 hover:bg-green-50 dark:hover:bg-green-900/20"
                               onClick={() => handleGetAlerts(session)}
+                              disabled={isLoading}
                             >
-                              <Eye className="h-4 w-4" />
+                              {isLoading ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <Eye className="h-4 w-4" />
+                              )}
                             </Button>
                           )}
                         </div>
