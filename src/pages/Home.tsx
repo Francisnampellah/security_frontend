@@ -340,6 +340,87 @@ export function Home() {
         </div>
       </div>
 
+      {/* Scanning Process Section */}
+      <div className="container mx-auto px-4 py-20">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold mb-4">Understanding the Scanning Process</h2>
+          <p className="text-muted-foreground max-w-2xl mx-auto">
+            Learn how our two-stage scanning process works to identify vulnerabilities
+          </p>
+        </div>
+        <div className="grid md:grid-cols-2 gap-8">
+          <div className="bg-card rounded-xl border p-8">
+            <div className="flex items-center space-x-4 mb-6">
+              <div className="bg-blue-500/10 p-3 rounded-lg">
+                <Network className="h-8 w-8 text-blue-500" />
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold">Spider Scan</h3>
+                <p className="text-muted-foreground">First Stage (0-100%)</p>
+              </div>
+            </div>
+            <p className="text-muted-foreground mb-4">
+              The Spider Scan crawls through your website to identify all accessible paths and URLs. This initial stage helps us map out the structure of your website for comprehensive testing.
+            </p>
+            <ul className="space-y-2">
+              <li className="flex items-center space-x-2">
+                <CheckCircle2 className="h-5 w-5 text-blue-500" />
+                <span>Identifies all accessible URLs</span>
+              </li>
+              <li className="flex items-center space-x-2">
+                <CheckCircle2 className="h-5 w-5 text-blue-500" />
+                <span>Maps website structure</span>
+              </li>
+              <li className="flex items-center space-x-2">
+                <CheckCircle2 className="h-5 w-5 text-blue-500" />
+                <span>Prepares for active scanning</span>
+              </li>
+            </ul>
+          </div>
+          <div className="bg-card rounded-xl border p-8">
+            <div className="flex items-center space-x-4 mb-6">
+              <div className="bg-purple-500/10 p-3 rounded-lg">
+                <Shield className="h-8 w-8 text-purple-500" />
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold">Active Scan</h3>
+                <p className="text-muted-foreground">Second Stage (0-100%)</p>
+              </div>
+            </div>
+            <p className="text-muted-foreground mb-4">
+              Once the Spider Scan is complete, the Active Scan begins. This stage performs in-depth security testing on all identified URLs to detect potential vulnerabilities.
+            </p>
+            <ul className="space-y-2">
+              <li className="flex items-center space-x-2">
+                <CheckCircle2 className="h-5 w-5 text-purple-500" />
+                <span>Tests for security vulnerabilities</span>
+              </li>
+              <li className="flex items-center space-x-2">
+                <CheckCircle2 className="h-5 w-5 text-purple-500" />
+                <span>Analyzes each identified URL</span>
+              </li>
+              <li className="flex items-center space-x-2">
+                <CheckCircle2 className="h-5 w-5 text-purple-500" />
+                <span>Generates detailed reports</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Troubleshooting Tip */}
+        <div className="mt-8 bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-6">
+          <div className="flex items-start space-x-4">
+            <AlertTriangle className="h-6 w-6 text-yellow-500 mt-1" />
+            <div>
+              <h3 className="text-lg font-semibold text-yellow-500 mb-2">Troubleshooting Tip</h3>
+              <p className="text-muted-foreground">
+                If you notice that your scans are not progressing, try refreshing the page. This can help resolve any temporary connection issues and ensure smooth scanning progress.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Benefits Section */}
       <div className="container mx-auto px-4 py-20">
         <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-2xl p-12">
