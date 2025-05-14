@@ -21,7 +21,7 @@ interface HeaderProps {
   Title?: string;
 }
 
-const Header: React.FC<HeaderProps> = ({ date, setDate, Title = "POS SYSTEM" }) => {
+const Header: React.FC<HeaderProps> = ({ date, setDate, Title = "VulnaGuard" }) => {
   const navigate = useNavigate();
   const profile = {
     id: 2,
