@@ -1,14 +1,9 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { ScanSession } from "@/type"
 import { Button } from "@/components/ui/button"
-import { MoreHorizontal, RefreshCw, Play, Eye } from "lucide-react"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+import { Eye, Loader2 } from "lucide-react"
+import { useScanSessions } from "../hooks/useScanSessions"
+import { useState } from "react"
 
 export const scanSessionColumns: ColumnDef<ScanSession>[] = [
   {
@@ -18,105 +13,79 @@ export const scanSessionColumns: ColumnDef<ScanSession>[] = [
   {
     accessorKey: "url",
     header: "URL",
-  },
-  {
-    accessorKey: "spiderId",
-    header: "Spider ID",
-  },
-  {
-    accessorKey: "activeId",
-    header: "Active ID",
-    cell: ({ row }) => row.original.activeId || "N/A",
+    cell: ({ row }) => (
+      <div className="font-mono text-sm">{row.original.url}</div>
+    ),
   },
   {
     accessorKey: "spiderStatus",
-    header: "Spider Status",
-    cell: ({ row }) => {
-      const status = row.original.spiderStatus
-      status
-    },
+    header: "Spider Progress",
+    cell: ({ row }) => (
+      <div className="flex items-center gap-2">
+        <div className="w-full bg-secondary rounded-full h-2">
+          <div
+            className="bg-primary h-2 rounded-full transition-all duration-300"
+            style={{ width: `${row.original.spiderStatus}%` }}
+          />
+        </div>
+        <span className="text-sm font-medium">{row.original.spiderStatus}%</span>
+      </div>
+    ),
   },
   {
     accessorKey: "activeStatus",
-    header: "Active Status",
-    cell: ({ row }) => {
-      const status = row.original.activeStatus
-      status
-    },
+    header: "Active Scan Progress",
+    cell: ({ row }) => (
+      <div className="flex items-center gap-2">
+        <div className="w-full bg-secondary rounded-full h-2">
+          <div
+            className="bg-primary h-2 rounded-full transition-all duration-300"
+            style={{ width: `${row.original.activeStatus}%` }}
+          />
+        </div>
+        <span className="text-sm font-medium">{row.original.activeStatus}%</span>
+      </div>
+    ),
   },
   {
     id: "actions",
     cell: ({ row }) => {
       const scanSession = row.original
-      console.log(scanSession)
+      const { getScan } = useScanSessions()
+      const [isLoading, setIsLoading] = useState(false)
+
       const isSpiderComplete = scanSession.spiderStatus === 100
       const isActiveComplete = scanSession.activeStatus === 100
-      const showRefresh = !isSpiderComplete || !isActiveComplete
-      const showActiveScan = isSpiderComplete && scanSession.activeStatus === 0
       const showViewResult = isSpiderComplete && isActiveComplete
+
+      const handleViewResults = async () => {
+        setIsLoading(true)
+        try {
+          await getScan.mutateAsync(scanSession.id)
+        } catch (error) {
+          console.error('Failed to get scan details:', error)
+        } finally {
+          setIsLoading(false)
+        }
+      }
 
       return (
         <div className="flex items-center gap-2">
-          {showRefresh && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-8 w-8 p-0"
-              onClick={() => {
-                // Add refresh logic here
-                console.log('Refresh scan:', scanSession.id)
-              }}
-            >
-              <RefreshCw className="h-4 w-4" />
-            </Button>
-          )}
-          {showActiveScan && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-8 w-8 p-0"
-              onClick={() => {
-                // Add active scan logic here
-                console.log('Start active scan:', scanSession.id)
-              }}
-            >
-              <Play className="h-4 w-4" />
-            </Button>
-          )}
           {showViewResult && (
             <Button
               variant="outline"
               size="sm"
               className="h-8 w-8 p-0"
-              onClick={() => {
-                // Add view result logic here
-                console.log('View results:', scanSession.id)
-              }}
+              onClick={handleViewResults}
+              disabled={isLoading}
             >
-              <Eye className="h-4 w-4" />
+              {isLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Eye className="h-4 w-4" />
+              )}
             </Button>
           )}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(scanSession.url)}
-              >
-                Copy URL
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => window.open(scanSession.url, '_blank')}
-              >
-                Open URL
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
       )
     },

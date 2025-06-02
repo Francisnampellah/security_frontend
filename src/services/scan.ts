@@ -1,6 +1,10 @@
 import axiosInstance from '@/lib/axiosInstance';
-import { ScanAlert } from '@/type';
-import { Medicine, ScanSession } from "../type"
+import { ScanAlert, ScanSession } from '@/type';
+
+interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+}
 
 export const scan = async (url: string) => {
   const response = await axiosInstance.post("/scan/spider/start", { url });
@@ -55,6 +59,24 @@ export const getScanSession = async (id: number): Promise<ScanSession> => {
 export const deleteScanSession = async (id: number): Promise<void> => {
   await axiosInstance.delete(`/scan-sessions/${id}`)
 }
+
+// Start a full scan (spider + active scan)
+export const startFullScan = async (url: string): Promise<ScanSession> => {
+  const response = await axiosInstance.post<ApiResponse<ScanSession>>("/scan/Fullscan", { url });
+  return response.data.data;
+};
+
+// Get all scan sessions for the current user
+export const getAllScans = async (): Promise<ApiResponse<ScanSession[]>> => {
+  const response = await axiosInstance.get<ApiResponse<ScanSession[]>>("/scan/getAllScans");
+  return response.data;
+};
+
+// Get a specific scan session by ID
+export const getScanById = async (id: number): Promise<ScanSession> => {
+  const response = await axiosInstance.get<ApiResponse<ScanSession>>(`/scan/getAllScans/${id}`);
+  return response.data.data;
+};
 
 
 

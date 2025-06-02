@@ -231,40 +231,49 @@ export interface Medicine {
 export interface ScanSession {
   id: number;
   url: string;
+  ipAddress: string;
+  startedAt: string;
+  webServer: string;
+  technologies: string[];
+  authenticationMethod: string | null;
   spiderId: string;
-  activeId: string | null;
+  activeId: string;
   spiderStatus: number;
   activeStatus: number;
+  spiderResults: string[];
+  activeResults: ScanAlert[] | null;
+  translatedResults: any | null;
   createdAt: string;
   updatedAt: string;
+  userId: string;
 }
 
 export interface ScanAlert {
-  sourceid: string
-  other: string
-  method: string
-  evidence: string
-  pluginId: string
-  cweid: string
-  confidence: string
-  sourceMessageId: number
-  wascid: string
-  description: string
-  messageId: string
-  inputVector: string
-  url: string
+  id: string;
+  url: string;
+  name: string;
+  risk: string;
   tags: {
-    [key: string]: string
-  }
-  reference: string
-  solution: string
-  alert: string
-  param: string
-  attack: string
-  name: string
-  risk: string
-  id: string
-  alertRef: string
+    [key: string]: string;
+  };
+  alert: string;
+  cweid: string;
+  other: string;
+  param: string;
+  attack: string;
+  method: string;
+  wascid: string;
+  alertRef: string;
+  evidence: string;
+  pluginId: string;
+  solution: string;
+  sourceid: string;
+  messageId: string;
+  reference: string;
+  confidence: string;
+  description: string;
+  inputVector: string;
+  sourceMessageId: number;
 }
   
     

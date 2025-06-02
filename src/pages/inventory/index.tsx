@@ -27,7 +27,7 @@ interface CreateScanSessionForm {
 }
 
 export default function ScanSessionsPage() {
-  const { scanSessions, isLoading, createSession } = useScanSessions()
+  const { scanSessions, isLoading, startScan } = useScanSessions()
   const [open, setOpen] = useState(false)
 
 
@@ -40,7 +40,7 @@ export default function ScanSessionsPage() {
   })
 
   const onSubmit = (data: CreateScanSessionForm) => {
-    createSession.mutate(data.url, {
+    startScan.mutate(data.url, {
       onSuccess: () => {
         setOpen(false)
         form.reset()

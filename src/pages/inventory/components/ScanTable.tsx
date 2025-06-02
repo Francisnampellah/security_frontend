@@ -1,6 +1,6 @@
 import { ScanSession, ScanAlert } from "@/type"
 import { Button } from "@/components/ui/button"
-import { MoreHorizontal, RefreshCw, Play, Eye, Shield, Loader2 } from "lucide-react"
+import { MoreHorizontal, RefreshCw, Eye, Loader2, Globe, Server, Shield, AlertTriangle, Info } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,39 +18,50 @@ import {
 } from "@/components/ui/table"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useScanSessions } from "../hooks/useScanSessions"
-import { startActiveScan } from "@/services/scan"
-import { useState, useEffect } from "react"
-import { ScanResultsModal } from "./ScanResultsModal"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { useState } from "react"
+import { Card, CardContent } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
+import { formatDistanceToNow } from "date-fns"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Badge } from "@/components/ui/badge"
 
 interface ScanTableProps {
-  data: any
+  data?: ScanSession[] | null
   isLoading?: boolean
 }
 
-export function ScanTable({ data, isLoading }: ScanTableProps) {
-  const { createSession, scanSessions, updateSpiderScanStatus, updateActiveScanStatus, getAlerts } = useScanSessions()
-  const [isResultsModalOpen, setIsResultsModalOpen] = useState(false)
-  const [currentAlerts, setCurrentAlerts] = useState<ScanAlert[]>([])
-  const [loadingAlerts, setLoadingAlerts] = useState<string | null>(null)
+export function ScanTable({ data = [], isLoading }: ScanTableProps) {
+  const [selectedScan, setSelectedScan] = useState<ScanSession | null>(null)
+  const [selectedNonTechnical, setSelectedNonTechnical] = useState<string | null>(null)
 
-  useEffect(() => {
-    if (data?.scanSessions) {
-      const refreshInterval = setInterval(() => {
-        data.scanSessions.forEach((session: ScanSession) => {
-          if (session.spiderStatus < 100) {
-            updateSpiderScanStatus.mutate(session.spiderId.toString())
-          }
-          if (session.activeId && session.activeStatus < 100) {
-            updateActiveScanStatus.mutate(session.activeId.toString())
-          }
-        })
-      }, 5000)
+  // Ensure data is always an array
+  const scanSessions = Array.isArray(data) ? data : []
 
-      return () => clearInterval(refreshInterval)
+  const handleViewResults = (session: ScanSession) => {
+    setSelectedScan(session)
+  }
+
+  const handleViewNonTechnical = (description: string) => {
+    setSelectedNonTechnical(description)
+  }
+
+  const getRiskColor = (risk: string) => {
+    switch (risk.toLowerCase()) {
+      case 'high':
+        return 'bg-red-500/10 text-red-500 hover:bg-red-500/20'
+      case 'medium':
+        return 'bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20'
+      case 'low':
+        return 'bg-blue-500/10 text-blue-500 hover:bg-blue-500/20'
+      default:
+        return 'bg-gray-500/10 text-gray-500 hover:bg-gray-500/20'
     }
-  }, [data?.scanSessions, updateSpiderScanStatus, updateActiveScanStatus])
+  }
 
   if (isLoading) {
     return (
@@ -66,168 +77,227 @@ export function ScanTable({ data, isLoading }: ScanTableProps) {
     )
   }
 
-  const handleGetAlerts = async (session: ScanSession) => {
-    setLoadingAlerts(session.id.toString())
-    try {
-      const result = await getAlerts.mutateAsync(session.url)
-      const uniqueAlerts = result.reduce((acc: ScanAlert[], current: ScanAlert) => {
-        const isDuplicate = acc.some(alert => 
-          alert.name === current.name && 
-          alert.risk === current.risk &&
-          alert.url === current.url &&
-          alert.param === current.param &&
-          alert.alert === current.alert
-        )
-        if (!isDuplicate) {
-          acc.push(current)
-        }
-        return acc
-      }, [])
-      setCurrentAlerts(uniqueAlerts)
-      setIsResultsModalOpen(true)
-    } catch (error) {
-      console.error('Failed to get alerts:', error)
-    } finally {
-      setLoadingAlerts(null)
-    }
-  }
-
-  const handleStartActiveScan = async (session: ScanSession) => {
-    try {
-      await startActiveScan(session.url)
-      setTimeout(() => {
-        window.location.reload()
-      }, 1000)
-    } catch (error) {
-      console.error('Failed to start active scan:', error)
-    }
-  }
-
-  const handleRefreshScan = (session: ScanSession) => {
-    if (session.spiderStatus != 100) {
-      updateSpiderScanStatus.mutate(session.spiderId.toString())
-    } else {
-      updateActiveScanStatus.mutate(session.activeId.toString())
-    }
-  }
-
   return (
-    <Card className="border-blue-200 dark:border-blue-800">
-      <CardHeader className="border-b border-border bg-muted/50">
-        <div className="flex items-center space-x-3">
-          <div className="bg-blue-100 dark:bg-blue-900/30 p-2 rounded-lg">
-            <Shield className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-          </div>
-          <div>
-            <CardTitle>Scan Sessions</CardTitle>
-            <CardDescription>
-              Monitor and manage your security scans
-            </CardDescription>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent className="p-0">
-        <div className="rounded-md">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-muted/50">
-                <TableHead className="w-[80px]">ID</TableHead>
-                <TableHead>URL</TableHead>
-                <TableHead className="w-[200px]">Spider Scan</TableHead>
-                <TableHead className="w-[200px]">Active Scan</TableHead>
-                <TableHead className="w-[120px] text-right">Actions</TableHead>
+    <>
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>URL</TableHead>
+              <TableHead>Server Info</TableHead>
+              <TableHead>Started</TableHead>
+              <TableHead>Spider Progress</TableHead>
+              <TableHead>Active Scan Progress</TableHead>
+              <TableHead>Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {scanSessions.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
+                  No scan sessions found. Start a new scan to begin.
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {data.scanSessions.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={5} className="h-32 text-center text-muted-foreground">
-                    No scan sessions found. Start a new scan to begin.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                data.scanSessions.map((session) => {
-                  const isSpiderComplete = session.spiderStatus === 100
-                  const isActiveComplete = session.activeStatus === 100
-                  const showRefresh = !isSpiderComplete || !isActiveComplete
-                  const showActiveScan = isSpiderComplete && session.activeStatus === 0
-                  const showViewResult = isSpiderComplete && isActiveComplete
-                  const isLoading = loadingAlerts === session.id.toString()
+            ) : (
+              scanSessions.map((session) => {
+                const isSpiderComplete = session.spiderStatus === 100
+                const isActiveComplete = session.activeStatus === 100
+                const showViewResult = isSpiderComplete && isActiveComplete
 
-                  return (
-                    <TableRow key={session.id} className="group">
-                      <TableCell className="font-medium">{session.id}</TableCell>
-                      <TableCell className="font-mono text-sm">{session.url}</TableCell>
-                      <TableCell>
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm text-muted-foreground">Progress</span>
-                            <span className="text-sm font-medium">{session.spiderStatus}%</span>
-                          </div>
-                          <Progress value={session.spiderStatus} className="h-2" />
+                return (
+                  <TableRow key={session.id} className="group">
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Globe className="h-4 w-4 text-muted-foreground" />
+                        <div className="font-mono text-sm">{session.url}</div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Server className="h-4 w-4 text-muted-foreground" />
+                        <div className="text-sm">
+                          <div className="font-medium">{session.webServer}</div>
+                          <div className="text-muted-foreground">{session.ipAddress}</div>
                         </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm text-muted-foreground">Progress</span>
-                            <span className="text-sm font-medium">{session.activeStatus}%</span>
-                          </div>
-                          <Progress value={session.activeStatus} className="h-2" />
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-sm text-muted-foreground">
+                        {formatDistanceToNow(new Date(session.startedAt), { addSuffix: true })}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-muted-foreground">Progress</span>
+                          <span className="text-sm font-medium">{session.spiderStatus}%</span>
                         </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center justify-end gap-2">
-                          {showRefresh && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="h-8 w-8 p-0 hover:bg-blue-50 dark:hover:bg-blue-900/20"
-                              onClick={() => handleRefreshScan(session)}
-                            >
-                              <RefreshCw className="h-4 w-4" />
-                            </Button>
-                          )}
-                          {showActiveScan && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="h-8 w-8 p-0 hover:bg-purple-50 dark:hover:bg-purple-900/20"
-                              onClick={() => handleStartActiveScan(session)}
-                            >
-                              <Play className="h-4 w-4" />
-                            </Button>
-                          )}
-                          {showViewResult && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="h-8 w-8 p-0 hover:bg-green-50 dark:hover:bg-green-900/20"
-                              onClick={() => handleGetAlerts(session)}
-                              disabled={isLoading}
-                            >
-                              {isLoading ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                              ) : (
-                                <Eye className="h-4 w-4" />
+                        <Progress value={session.spiderStatus} className="h-2" />
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-muted-foreground">Progress</span>
+                          <span className="text-sm font-medium">{session.activeStatus}%</span>
+                        </div>
+                        <Progress value={session.activeStatus} className="h-2" />
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        {showViewResult && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-8 w-8 p-0"
+                            onClick={() => handleViewResults(session)}
+                          >
+                            <Shield className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )
+              })
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
+      <Dialog open={!!selectedScan} onOpenChange={() => setSelectedScan(null)}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Scan Results</DialogTitle>
+          </DialogHeader>
+          {selectedScan && (
+            <div className="space-y-6">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <h3 className="text-sm font-medium mb-2">Target Information</h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-center gap-2">
+                      <Globe className="h-4 w-4 text-muted-foreground" />
+                      <span>{selectedScan.url}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Server className="h-4 w-4 text-muted-foreground" />
+                      <span>{selectedScan.webServer}</span>
+                    </div>
+                    <div className="text-muted-foreground">
+                      IP: {selectedScan.ipAddress}
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium mb-2">Technologies</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedScan.technologies.map((tech, index) => (
+                      <Badge key={index} variant="secondary">
+                        {tech}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {selectedScan.activeResults && selectedScan.activeResults.length > 0 ? (
+                <div className="space-y-4">
+                  <h3 className="text-sm font-medium">Security Alerts</h3>
+                  <div className="space-y-4">
+                    {Array.from(
+                      new Map<string, ScanAlert>(
+                        selectedScan.activeResults
+                          .map(alert => {
+                            const referenceKey = Object.keys(alert.tags).sort().join(',');
+                            return [referenceKey, alert] as [string, ScanAlert];
+                          })
+                          .sort((a, b) => {
+                            const riskOrder = { high: 0, medium: 1, low: 2 };
+                            return riskOrder[a[1].risk.toLowerCase()] - riskOrder[b[1].risk.toLowerCase()];
+                          })
+                      ).values()
+                    ).map((alert, index) => (
+                      <Card key={alert.id}>
+                        <CardContent className="p-4">
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="space-y-2 flex-1">
+                              <div className="flex items-center gap-2">
+                                <AlertTriangle className="h-4 w-4 text-yellow-500" />
+                                <h4 className="font-medium">{alert.name}</h4>
+                                <Badge className={getRiskColor(alert.risk)}>
+                                  {alert.risk}
+                                </Badge>
+                                {selectedScan.translatedResults?.[index]?.nonTechnicalDescription && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-8 w-8 p-0"
+                                    onClick={() => handleViewNonTechnical(selectedScan.translatedResults[index].nonTechnicalDescription)}
+                                  >
+                                    <Info className="h-4 w-4" />
+                                  </Button>
+                                )}
+                              </div>
+                              <p className="text-sm text-muted-foreground">
+                                {alert.description}
+                              </p>
+                              {alert.solution && (
+                                <div className="mt-2">
+                                  <h5 className="text-sm font-medium mb-1">Solution</h5>
+                                  <p className="text-sm text-muted-foreground whitespace-pre-line">
+                                    {alert.solution}
+                                  </p>
+                                </div>
                               )}
-                            </Button>
-                          )}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  )
-                })
+                              {Object.entries(alert.tags).length > 0 && (
+                                <div className="mt-2">
+                                  <h5 className="text-sm font-medium mb-1">References</h5>
+                                  <div className="flex flex-wrap gap-2">
+                                    {Object.entries(alert.tags).map(([key, value]) => (
+                                      <a
+                                        key={key}
+                                        href={value}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-sm text-blue-500 hover:underline"
+                                      >
+                                        {key}
+                                      </a>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center text-muted-foreground py-8">
+                  No security alerts found
+                </div>
               )}
-            </TableBody>
-          </Table>
-        </div>
-      </CardContent>
-      <ScanResultsModal 
-        isOpen={isResultsModalOpen}
-        onOpenChange={setIsResultsModalOpen}
-        alerts={currentAlerts}
-      />
-    </Card>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!selectedNonTechnical} onOpenChange={() => setSelectedNonTechnical(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Non-Technical Description</DialogTitle>
+          </DialogHeader>
+          <div className="mt-4">
+            <p className="text-sm text-muted-foreground">
+              {selectedNonTechnical}
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }
