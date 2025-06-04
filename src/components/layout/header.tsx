@@ -65,13 +65,10 @@ const Header: React.FC<HeaderProps> = ({ date, setDate, Title = "VulnaGuard" }) 
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0">
-            <Calendar mode="single" selected={date} onSelect={setDate} initialFocus />
+            <Calendar  mode="single" selected={date} onSelect={setDate} initialFocus />
           </PopoverContent>
         </Popover>
-        <Button variant="outline">
-          <DownloadIcon className="mr-2 h-4 w-4" />
-          Export
-        </Button>
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-8 w-8 rounded-full">
