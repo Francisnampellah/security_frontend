@@ -9,8 +9,17 @@ interface ScanOverviewProps {
 
 export const ScanOverview: React.FC<ScanOverviewProps> = ({ scanSessions }) => {
   const totalScans = scanSessions.length;
-  const totalVulnerabilities = scanSessions.reduce((sum, session) => 
-    sum + (session.activeResults?.length || 0), 0);
+  
+  // Count unique vulnerabilities using reference key (combination of sorted tags)
+  const uniqueVulnerabilities = new Set(
+    scanSessions.flatMap(session => 
+      session.activeResults?.map(result => {
+        const referenceKey = Object.keys(result.tags).sort().join(',');
+        return referenceKey;
+      }) || []
+    )
+  ).size;
+
   const successfulScans = scanSessions.filter(session => 
     session.spiderStatus === 100 && session.activeStatus === 100).length;
 
@@ -27,10 +36,10 @@ export const ScanOverview: React.FC<ScanOverviewProps> = ({ scanSessions }) => {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Vulnerabilities</CardTitle>
+            <CardTitle className="text-sm font-medium">Unique Vulnerabilities</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalVulnerabilities}</div>
+            <div className="text-2xl font-bold">{uniqueVulnerabilities}</div>
           </CardContent>
         </Card>
         <Card>
