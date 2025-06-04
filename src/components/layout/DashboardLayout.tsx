@@ -43,20 +43,10 @@ const navItems = [
     path: "/dashboard/inventory",
   },
   {
-    title: "Reports",
-    icon: FileText,
-    path: "#/dashboard/reports",
-  },
-  {
     title: "Settings",
     icon: Settings,
-    path: "#/dashboard/settings",
-  },
-  {
-    title: "Help",
-    icon: HelpCircle,
-    path: "#/dashboard/help",
-  },
+    path: "/dashboard/settings",
+  }
 ]
 
 export default function DashboardLayout({ children }: DashboardLayoutProps) {

@@ -38,5 +38,15 @@ export const AuthService = {
       refreshToken
     });
     return response.data;
+  },
+
+  async changePassword(currentPassword: string, newPassword: string) {
+
+    console.log(currentPassword, newPassword)
+    const response = await axiosInstance.post(`/auth/change-password`, {
+      currentPassword,
+      newPassword
+    });
+    return response.data;
   }
 };

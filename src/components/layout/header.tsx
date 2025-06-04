@@ -14,6 +14,8 @@ import {
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useNavigate } from "react-router-dom";
 import { AuthService } from "@/services/authService";
+import { useQuery } from "@tanstack/react-query";
+import axiosInstance from "@/lib/axiosInstance";
 
 interface HeaderProps {
   date: Date;
@@ -21,15 +23,23 @@ interface HeaderProps {
   Title?: string;
 }
 
+interface User {
+  id: string;
+  email: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 const Header: React.FC<HeaderProps> = ({ date, setDate, Title = "VulnaGuard" }) => {
   const navigate = useNavigate();
-  const profile = {
-    id: 2,
-    email: "Someone@gmail.com",
-    name: "Someone",
-    role: "Security Analyst",
-    image: "https://ui-avatars.com/api/?name=Someone&background=0D8ABC&color=fff"
-  };
+  
+  const { data: userData } = useQuery({
+    queryKey: ['user'],
+    queryFn: async () => {
+      const response = await axiosInstance.get('/auth/me');
+      return response.data.user as User;
+    }
+  });
 
   const handleLogout = async () => {
     try {
@@ -37,7 +47,6 @@ const Header: React.FC<HeaderProps> = ({ date, setDate, Title = "VulnaGuard" }) 
       navigate('/login');
     } catch (error) {
       console.error('Error during logout:', error);
-      // Still navigate to login even if there's an error
       navigate('/login');
     }
   };
@@ -67,7 +76,7 @@ const Header: React.FC<HeaderProps> = ({ date, setDate, Title = "VulnaGuard" }) 
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-8 w-8 rounded-full">
               <Avatar className="h-8 w-8">
-                <AvatarImage src={profile.image} alt={profile.name} />
+                <AvatarImage src={`https://ui-avatars.com/api/?name=${userData?.email}&background=0D8ABC&color=fff`} alt={userData?.email} />
                 <AvatarFallback>
                   <PersonIcon className="h-4 w-4" />
                 </AvatarFallback>
@@ -77,9 +86,8 @@ const Header: React.FC<HeaderProps> = ({ date, setDate, Title = "VulnaGuard" }) 
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">{profile.name}</p>
-                <p className="text-xs leading-none text-muted-foreground">{profile.email}</p>
-                <p className="text-xs leading-none text-muted-foreground">{profile.role}</p>
+                <p className="text-sm font-medium leading-none">{userData?.email}</p>
+                <p className="text-xs leading-none text-muted-foreground">Security Analyst</p>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />

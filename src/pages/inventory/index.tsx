@@ -21,6 +21,8 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import DashboardLayout from "@/components/layout/DashboardLayout"
+import { ScanInput } from "../dashboard/components/ScanInput"
+import Header from "@/components/layout/header"
 
 interface CreateScanSessionForm {
   url: string
@@ -29,7 +31,7 @@ interface CreateScanSessionForm {
 export default function ScanSessionsPage() {
   const { scanSessions, isLoading, startScan } = useScanSessions()
   const [open, setOpen] = useState(false)
-
+  const [date, setDate] = useState<Date>(new Date())
 
   console.log(scanSessions)
 
@@ -50,45 +52,11 @@ export default function ScanSessionsPage() {
 
   return (
     <DashboardLayout>
+         <Header date={date} setDate={setDate} />
     <div className="container mx-auto py-10">
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex w-full justify-between items-center mb-8">
         <h1 className="text-2xl font-bold">Scan Sessions</h1>
-        {/* <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              New Scan Session
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Create New Scan Session</DialogTitle>
-            </DialogHeader>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="url"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>URL</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="https://example.com"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button type="submit" className="w-full">
-                  Create Session
-                </Button>
-              </form>
-            </Form>
-          </DialogContent>
-        </Dialog> */}
+        <ScanInput />
       </div>
 
       <ScanTable data={scanSessions} isLoading={isLoading} />

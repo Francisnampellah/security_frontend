@@ -31,10 +31,10 @@ export const getActiveScanStatus = async (scanId: string) => {
   return response.data;
 };
 
-export const getAllScanSessions = async () => {
-  const response = await axiosInstance.get("/scan/scan-sessions");
-  return response.data;
-};
+// export const getAllScanSessions = async () => {
+//   const response = await axiosInstance.get("/scan/scan-sessions");
+//   return response.data;
+// };
 
 export const getScanResults = async (scanId: string) => {
   const response = await axiosInstance.get(`/api/zap/spider/scan/${scanId}`);

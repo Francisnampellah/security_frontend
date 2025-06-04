@@ -24,43 +24,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const initializeAuth = async () => {
-
-
       const token = localStorage.getItem('token');
-      console.log('Token from localStorage:', token);
       const refreshToken = localStorage.getItem('refreshToken');
       
       if (token) {
         setToken(token);
         try {
-          // const userData = await AuthService.getCurrentUser();
-          // setUser(userData);
+          const userData = await AuthService.getCurrentUser();
+          setUser(userData);
         } catch (error) {
-          // If getting current user fails, try to refresh the token
           if (refreshToken) {
             try {
               const { accessToken: newToken, refreshToken: newRefreshToken } = await AuthService.refreshToken(refreshToken);
-
-              console.log('New token:', newToken);
-              console.log('New refresh token:', newRefreshToken);
-
-              // localStorage.setItem('token', newToken);
+              localStorage.setItem('token', newToken);
               localStorage.setItem('refreshToken', newRefreshToken);
               setToken(newToken);
-              // const userData = await AuthService.getCurrentUser();
-              // setUser(userData);
+              const userData = await AuthService.getCurrentUser();
+              setUser(userData);
             } catch (refreshError) {
-              // If refresh token fails, clear everything
-              // localStorage.removeItem('token');
-              // localStorage.removeItem('refreshToken');
-              // setToken(null);
-              // setUser(null);
+              localStorage.removeItem('token');
+              localStorage.removeItem('refreshToken');
+              setToken(null);
+              setUser(null);
             }
           } else {
-            // If no refresh token, clear everything
-            // localStorage.removeItem('token');
-            // setToken(null);
-            // setUser(null);
+            localStorage.removeItem('token');
+            setToken(null);
+            setUser(null);
           }
         }
       }
@@ -83,6 +73,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem('refreshToken');
     setToken(null);
     setUser(null);
+    window.location.href = '/login';
   };
 
   return (
