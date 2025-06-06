@@ -33,16 +33,17 @@ export default function DashboardPage() {
   return (
     <DashboardLayout>
       <Header date={date} setDate={setDate} />
-      <div className="flex w-full flex-col">
+      <div className="container mx-auto py-10">
+        <div className="flex w-full justify-between items-center mb-8">
+          <h1 className="text-2xl font-bold">Dashboard</h1>
+        </div>
         <main className="flex-1">
-          <div className="container mx-auto px-4 py-6">
-            <ScanOverview scanSessions={scanSessions} />
-            <div className="mt-6">
-              <ScanningHelp />
-            </div>
-            {/* <VulnerabilitySummary />
-            <VulnerabilityTests/> */}
+          <ScanOverview scanSessions={scanSessions} />
+          <div className="mt-6">
+            <ScanningHelp />
           </div>
+          {/* <VulnerabilitySummary />
+          <VulnerabilityTests/> */}
         </main>
       </div>
     </DashboardLayout>

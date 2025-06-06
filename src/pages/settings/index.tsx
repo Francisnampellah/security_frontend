@@ -10,11 +10,13 @@ export default function SettingsPage() {
   return (
     <DashboardLayout>
       <Header date={date} setDate={setDate} />
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8">Settings</h1>
-        
-            <ChangePassword />
-
+      <div className="container mx-auto py-10">
+        <div className="flex w-full justify-between items-center mb-8">
+          <h1 className="text-2xl font-bold">Settings</h1>
+        </div>
+        <main className="flex-1">
+          <ChangePassword />
+        </main>
       </div>
     </DashboardLayout>
   );
