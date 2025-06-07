@@ -86,15 +86,14 @@ export function ScanTable({ data = [], isLoading }: ScanTableProps) {
               <TableHead>URL</TableHead>
               <TableHead>Server Info</TableHead>
               <TableHead>Started</TableHead>
-              <TableHead>Spider Progress</TableHead>
-              <TableHead>Active Scan Progress</TableHead>
+              <TableHead>Scan Progress</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {scanSessions.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
+                <TableCell colSpan={5} className="h-32 text-center text-muted-foreground">
                   No scan sessions found. Start a new scan to begin.
                 </TableCell>
               </TableRow>
@@ -102,7 +101,18 @@ export function ScanTable({ data = [], isLoading }: ScanTableProps) {
               scanSessions.map((session) => {
                 const isSpiderComplete = session.spiderStatus === 100
                 const isActiveComplete = session.activeStatus === 100
-                const showViewResult = isSpiderComplete && isActiveComplete
+                const hasActiveResults = session.activeResults !== null
+                const showViewResult = isSpiderComplete && isActiveComplete && hasActiveResults
+                
+                // Calculate combined progress
+                let combinedProgress = 0
+                if (isSpiderComplete) {
+                  // If spider is complete, show active scan progress
+                  combinedProgress = hasActiveResults ? 100 : Math.min(session.activeStatus, 99)
+                } else {
+                  // If spider is not complete, show spider progress
+                  combinedProgress = session.spiderStatus
+                }
 
                 return (
                   <TableRow key={session.id} className="group">
@@ -130,18 +140,9 @@ export function ScanTable({ data = [], isLoading }: ScanTableProps) {
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
                           <span className="text-sm text-muted-foreground">Progress</span>
-                          <span className="text-sm font-medium">{session.spiderStatus}%</span>
+                          <span className="text-sm font-medium">{combinedProgress}%</span>
                         </div>
-                        <Progress value={session.spiderStatus} className="h-2" />
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm text-muted-foreground">Progress</span>
-                          <span className="text-sm font-medium">{session.activeStatus}%</span>
-                        </div>
-                        <Progress value={session.activeStatus} className="h-2" />
+                        <Progress value={combinedProgress} className="h-2" />
                       </div>
                     </TableCell>
                     <TableCell>
