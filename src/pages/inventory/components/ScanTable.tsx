@@ -1,6 +1,6 @@
 import { ScanSession, ScanAlert } from "@/type"
 import { Button } from "@/components/ui/button"
-import { MoreHorizontal, RefreshCw, Eye, Loader2, Globe, Server, Shield, AlertTriangle, Info } from "lucide-react"
+import { MoreHorizontal, RefreshCw, Eye, Loader2, Globe, Server, Shield, AlertTriangle, Info, Download } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,6 +29,16 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { PDFDownloadLink } from '@react-pdf/renderer'
+import { TechnicalReportPDF } from "@/components/reports/TechnicalReportPDF"
+import { NonTechnicalReportModal } from "./NonTechnicalReportModal"
+
+interface NonTechnicalReport {
+  name: string;
+  risk: string;
+  description: string;
+}
 
 interface ScanTableProps {
   data?: ScanSession[] | null
@@ -36,18 +46,32 @@ interface ScanTableProps {
 }
 
 export function ScanTable({ data = [], isLoading }: ScanTableProps) {
-  const [selectedScan, setSelectedScan] = useState<ScanSession | null>(null)
-  const [selectedNonTechnical, setSelectedNonTechnical] = useState<string | null>(null)
+  const [technicalScan, setTechnicalScan] = useState<ScanSession | null>(null)
+  const [nonTechnicalScan, setNonTechnicalScan] = useState<ScanSession | null>(null)
+  const [selectedNonTechnical, setSelectedNonTechnical] = useState<NonTechnicalReport[] | null>(null)
 
   // Ensure data is always an array
   const scanSessions = Array.isArray(data) ? data : []
 
   const handleViewResults = (session: ScanSession) => {
-    setSelectedScan(session)
+    setTechnicalScan(session)
+    setNonTechnicalScan(null)
+    setSelectedNonTechnical(null)
   }
 
-  const handleViewNonTechnical = (description: string) => {
-    setSelectedNonTechnical(description)
+  const handleViewNonTechnical = (session: ScanSession) => {
+    if (session.activeResults && session.activeResults.length > 0) {
+      const nonTechnicalDescriptions = session.activeResults
+        .filter(alert => alert.nonTechnicalDescription)
+        .map(alert => ({
+          name: alert.name,
+          risk: alert.risk,
+          description: alert.nonTechnicalDescription || ''
+        }));
+      setNonTechnicalScan(session);
+      setSelectedNonTechnical(nonTechnicalDescriptions);
+      setTechnicalScan(null);
+    }
   }
 
   const getRiskColor = (risk: string) => {
@@ -148,14 +172,26 @@ export function ScanTable({ data = [], isLoading }: ScanTableProps) {
                     <TableCell>
                       <div className="flex items-center gap-2">
                         {showViewResult && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="h-8 w-8 p-0"
-                            onClick={() => handleViewResults(session)}
-                          >
-                            <Shield className="h-4 w-4" />
-                          </Button>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-8 w-8 p-0"
+                              >
+                                <Shield className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuLabel>View Report</DropdownMenuLabel>
+                              <DropdownMenuItem onClick={() => handleViewResults(session)}>
+                                Technical Report
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleViewNonTechnical(session)}>
+                                Non-Technical Report
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         )}
                       </div>
                     </TableCell>
@@ -167,138 +203,158 @@ export function ScanTable({ data = [], isLoading }: ScanTableProps) {
         </Table>
       </div>
 
-      <Dialog open={!!selectedScan} onOpenChange={() => setSelectedScan(null)}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Scan Results</DialogTitle>
-          </DialogHeader>
-          {selectedScan && (
-            <div className="space-y-6">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <h3 className="text-sm font-medium mb-2">Target Information</h3>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex items-center gap-2">
-                      <Globe className="h-4 w-4 text-muted-foreground" />
-                      <span>{selectedScan.url}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Server className="h-4 w-4 text-muted-foreground" />
-                      <span>{selectedScan.webServer}</span>
-                    </div>
-                    <div className="text-muted-foreground">
-                      IP: {selectedScan.ipAddress}
-                    </div>
-                  </div>
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium mb-2">Technologies</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedScan.technologies.map((tech, index) => (
-                      <Badge key={index} variant="secondary">
-                        {tech}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {selectedScan.activeResults && selectedScan.activeResults.length > 0 ? (
-                <div className="space-y-4">
-                  <h3 className="text-sm font-medium">Security Alerts</h3>
-                  <div className="space-y-4">
-                    {Array.from(
-                      new Map<string, ScanAlert>(
-                        selectedScan.activeResults
-                          .map(alert => {
-                            const referenceKey = Object.keys(alert.tags).sort().join(',');
-                            return [referenceKey, alert] as [string, ScanAlert];
-                          })
-                          .sort((a, b) => {
-                            const riskOrder = { high: 0, medium: 1, low: 2 };
-                            return riskOrder[a[1].risk.toLowerCase()] - riskOrder[b[1].risk.toLowerCase()];
-                          })
-                      ).values()
-                    ).map((alert, index) => (
-                      <Card key={alert.id}>
-                        <CardContent className="p-4">
-                          <div className="flex items-start justify-between gap-4">
-                            <div className="space-y-2 flex-1">
-                              <div className="flex items-center gap-2">
-                                <AlertTriangle className="h-4 w-4 text-yellow-500" />
-                                <h4 className="font-medium">{alert.name}</h4>
-                                <Badge className={getRiskColor(alert.risk)}>
-                                  {alert.risk}
-                                </Badge>
-                                {selectedScan.translatedResults?.[index]?.nonTechnicalDescription && (
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-8 w-8 p-0"
-                                    onClick={() => handleViewNonTechnical(selectedScan.translatedResults[index].nonTechnicalDescription)}
-                                  >
-                                    <Info className="h-4 w-4" />
-                                  </Button>
-                                )}
-                              </div>
-                              <p className="text-sm text-muted-foreground">
-                                {alert.description}
-                              </p>
-                              {alert.solution && (
-                                <div className="mt-2">
-                                  <h5 className="text-sm font-medium mb-1">Solution</h5>
-                                  <p className="text-sm text-muted-foreground whitespace-pre-line">
-                                    {alert.solution}
-                                  </p>
-                                </div>
-                              )}
-                              {Object.entries(alert.tags).length > 0 && (
-                                <div className="mt-2">
-                                  <h5 className="text-sm font-medium mb-1">References</h5>
-                                  <div className="flex flex-wrap gap-2">
-                                    {Object.entries(alert.tags).map(([key, value]) => (
-                                      <a
-                                        key={key}
-                                        href={value}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-sm text-blue-500 hover:underline"
-                                      >
-                                        {key}
-                                      </a>
-                                    ))}
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <div className="text-center text-muted-foreground py-8">
-                  No security alerts found
+      <Dialog open={!!technicalScan} onOpenChange={() => setTechnicalScan(null)}>
+        <DialogContent className="max-w-4xl max-h-[90vh]">
+          <DialogHeader className="pb-4 border-b">
+            <div className="flex items-center justify-between">
+              <DialogTitle className="text-xl font-semibold">Technical Security Report</DialogTitle>
+              {technicalScan && (
+                <div className="flex gap-2">
+                  <PDFDownloadLink
+                    document={
+                      <TechnicalReportPDF
+                        alerts={technicalScan.activeResults || []}
+                        targetInfo={{
+                          url: technicalScan.url,
+                          webServer: technicalScan.webServer,
+                          ipAddress: technicalScan.ipAddress
+                        }}
+                      />
+                    }
+                    fileName={`technical-report-${technicalScan.url.replace(/[^a-z0-9]/gi, '-')}.pdf`}
+                  >
+                    {({ loading }) => (
+                      <Button variant="outline" size="sm" disabled={loading}>
+                        {loading ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <>
+                            <Download className="h-4 w-4 mr-2" />
+                            Download Technical PDF
+                          </>
+                        )}
+                      </Button>
+                    )}
+                  </PDFDownloadLink>
                 </div>
               )}
             </div>
-          )}
+          </DialogHeader>
+          <ScrollArea className="h-[calc(90vh-8rem)] pr-4">
+            {technicalScan && (
+              <div className="space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <h3 className="text-sm font-medium mb-2">Target Information</h3>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-center gap-2">
+                        <Globe className="h-4 w-4 text-muted-foreground" />
+                        <span>{technicalScan.url}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Server className="h-4 w-4 text-muted-foreground" />
+                        <span>{technicalScan.webServer}</span>
+                      </div>
+                      <div className="text-muted-foreground">
+                        IP: {technicalScan.ipAddress}
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-medium mb-2">Technologies</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {technicalScan.technologies.map((tech, index) => (
+                        <Badge key={index} variant="secondary">
+                          {tech}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {technicalScan.activeResults && technicalScan.activeResults.length > 0 ? (
+                  <div className="space-y-4">
+                    <h3 className="text-sm font-medium">Security Alerts</h3>
+                    <div className="space-y-4">
+                      {Array.from(
+                        new Map<string, ScanAlert>(
+                          technicalScan.activeResults
+                            .map(alert => {
+                              const referenceKey = Object.keys(alert.tags).sort().join(',');
+                              return [referenceKey, alert] as [string, ScanAlert];
+                            })
+                            .sort((a, b) => {
+                              const riskOrder = { high: 0, medium: 1, low: 2 };
+                              return riskOrder[a[1].risk.toLowerCase()] - riskOrder[b[1].risk.toLowerCase()];
+                            })
+                        ).values()
+                      ).map((alert, index) => (
+                        <Card key={alert.id}>
+                          <CardContent className="p-4">
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="space-y-2 flex-1">
+                                <div className="flex items-center gap-2">
+                                  <AlertTriangle className="h-4 w-4 text-yellow-500" />
+                                  <h4 className="font-medium">{alert.name}</h4>
+                                  <Badge className={getRiskColor(alert.risk)}>
+                                    {alert.risk}
+                                  </Badge>
+                                </div>
+                                <p className="text-sm text-muted-foreground">
+                                  {alert.description}
+                                </p>
+                                {alert.solution && (
+                                  <div className="mt-2">
+                                    <h5 className="text-sm font-medium mb-1">Solution</h5>
+                                    <p className="text-sm text-muted-foreground whitespace-pre-line">
+                                      {alert.solution}
+                                    </p>
+                                  </div>
+                                )}
+                                {Object.entries(alert.tags).length > 0 && (
+                                  <div className="mt-2">
+                                    <h5 className="text-sm font-medium mb-1">References</h5>
+                                    <div className="flex flex-wrap gap-2">
+                                      {Object.entries(alert.tags).map(([key, value]) => (
+                                        <a
+                                          key={key}
+                                          href={value}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="text-sm text-blue-500 hover:underline"
+                                        >
+                                          {key}
+                                        </a>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center text-muted-foreground py-8">
+                    No security alerts found
+                  </div>
+                )}
+              </div>
+            )}
+          </ScrollArea>
         </DialogContent>
       </Dialog>
 
-      <Dialog open={!!selectedNonTechnical} onOpenChange={() => setSelectedNonTechnical(null)}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Non-Technical Description</DialogTitle>
-          </DialogHeader>
-          <div className="mt-4">
-            <p className="text-sm text-muted-foreground">
-              {selectedNonTechnical}
-            </p>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <NonTechnicalReportModal
+        scan={nonTechnicalScan}
+        reports={selectedNonTechnical}
+        onClose={() => {
+          setNonTechnicalScan(null);
+          setSelectedNonTechnical(null);
+        }}
+      />
     </>
   )
 }

@@ -274,6 +274,7 @@ export interface ScanAlert {
   description: string;
   inputVector: string;
   sourceMessageId: number;
+  nonTechnicalDescription?: string;
 }
   
     
