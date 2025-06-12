@@ -11,6 +11,7 @@ export const ScanOverview: React.FC<ScanOverviewProps> = ({ scanSessions }) => {
   const totalScans = scanSessions.length;
   
   // Count unique vulnerabilities using reference key (combination of sorted tags)
+  
   const uniqueVulnerabilities = new Set(
     scanSessions.flatMap(session => 
       session.activeResults?.map(result => {
