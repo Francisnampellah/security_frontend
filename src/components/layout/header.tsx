@@ -30,7 +30,7 @@ interface User {
   updatedAt: string;
 }
 
-const Header: React.FC<HeaderProps> = ({ date, setDate, Title = "VulnaGuard" }) => {
+const Header: React.FC<HeaderProps> = ({ date, setDate, Title = "VulnGuard" }) => {
   const navigate = useNavigate();
   
   const { data: userData } = useQuery({
