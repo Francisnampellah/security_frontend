@@ -1,6 +1,6 @@
 import { ScanSession, ScanAlert } from "@/type"
 import { Button } from "@/components/ui/button"
-import { MoreHorizontal, RefreshCw, Eye, Loader2, Globe, Server, Shield, AlertTriangle, Info, Download } from "lucide-react"
+import { MoreHorizontal, RefreshCw, Eye, Loader2, Globe, Server, Shield, AlertTriangle, Info, Download, Trash2 } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -50,6 +50,7 @@ export function ScanTable({ data = [], isLoading }: ScanTableProps) {
   const [technicalScan, setTechnicalScan] = useState<ScanSession | null>(null)
   const [nonTechnicalScan, setNonTechnicalScan] = useState<ScanSession | null>(null)
   const [selectedNonTechnical, setSelectedNonTechnical] = useState<NonTechnicalReport[] | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   // Ensure data is always an array
   const scanSessions = Array.isArray(data) ? data : []
@@ -85,6 +86,29 @@ export function ScanTable({ data = [], isLoading }: ScanTableProps) {
         return 'bg-blue-500/10 text-blue-500 hover:bg-blue-500/20'
       default:
         return 'bg-gray-500/10 text-gray-500 hover:bg-gray-500/20'
+    }
+  }
+
+  const handleDeleteScan = async (scanId: number) => {
+    try {
+      setIsDeleting(true)
+      const response = await fetch(`/api/scans/${scanId}`, {
+        method: 'DELETE',
+      })
+      
+      if (!response.ok) {
+        throw new Error('Failed to delete scan')
+      }
+
+      // Close the modal and refresh the data
+      setTechnicalScan(null)
+      // You might want to add a callback prop to refresh the parent component's data
+      // onDelete?.(scanId)
+    } catch (error) {
+      console.error('Error deleting scan:', error)
+      // You might want to show an error toast here
+    } finally {
+      setIsDeleting(false)
     }
   }
 
@@ -173,26 +197,41 @@ export function ScanTable({ data = [], isLoading }: ScanTableProps) {
                     <TableCell>
                       <div className="flex items-center gap-2">
                         {showViewResult && (
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="h-8 w-8 p-0"
-                              >
-                                <Shield className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuLabel>View Report</DropdownMenuLabel>
-                              <DropdownMenuItem onClick={() => handleViewResults(session)}>
-                                Technical Report
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleViewNonTechnical(session)}>
-                                Non-Technical Report
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                          <>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="h-8 w-8 p-0"
+                                >
+                                  <Shield className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuLabel>View Report</DropdownMenuLabel>
+                                <DropdownMenuItem onClick={() => handleViewResults(session)}>
+                                  Technical Report
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleViewNonTechnical(session)}>
+                                  Non-Technical Report
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              className="h-8 w-8 p-0"
+                              onClick={() => handleDeleteScan(session.id)}
+                              disabled={isDeleting}
+                            >
+                              {isDeleting ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <Trash2 className="h-4 w-4" />
+                              )}
+                            </Button>
+                          </>
                         )}
                       </div>
                     </TableCell>
@@ -334,35 +373,54 @@ export function ScanTable({ data = [], isLoading }: ScanTableProps) {
             )}
           </ScrollArea>
           <DialogFooter className="mt-4 pt-4 border-t flex justify-between">
-            {technicalScan && (
-              <PDFDownloadLink
-                document={
-                  <TechnicalReportPDF
-                    alerts={technicalScan.activeResults || []}
-                    targetInfo={{
-                      url: technicalScan.url,
-                      webServer: technicalScan.webServer,
-                      ipAddress: technicalScan.ipAddress
-                    }}
-                  />
-                }
-                fileName={`technical-report-${technicalScan.url.replace(/[^a-z0-9]/gi, '-')}.pdf`}
-              >
-                {({ loading }) => (
-                  <Button variant="outline" size="sm" disabled={loading}>
-                    {loading ? (
+            <div className="flex items-center gap-2">
+              {technicalScan && (
+                <>
+                  <PDFDownloadLink
+                    document={
+                      <TechnicalReportPDF
+                        alerts={technicalScan.activeResults || []}
+                        targetInfo={{
+                          url: technicalScan.url,
+                          webServer: technicalScan.webServer,
+                          ipAddress: technicalScan.ipAddress
+                        }}
+                      />
+                    }
+                    fileName={`technical-report-${technicalScan.url.replace(/[^a-z0-9]/gi, '-')}.pdf`}
+                  >
+                    {({ loading }) => (
+                      <Button variant="outline" size="sm" disabled={loading}>
+                        {loading ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <>
+                            <Download className="h-4 w-4 mr-2" />
+                            Download Technical PDF
+                          </>
+                        )}
+                      </Button>
+                    )}
+                  </PDFDownloadLink>
+                  <Button 
+                    variant="destructive" 
+                    size="sm"
+                    onClick={() => handleDeleteScan(technicalScan.id)}
+                    disabled={isDeleting}
+                  >
+                    {isDeleting ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
                       <>
-                        <Download className="h-4 w-4 mr-2" />
-                        Download Technical PDF
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Delete Scan
                       </>
                     )}
                   </Button>
-                )}
-              </PDFDownloadLink>
-            )}
-            <Button variant="destructive" onClick={() => setTechnicalScan(null)}>
+                </>
+              )}
+            </div>
+            <Button variant="outline" onClick={() => setTechnicalScan(null)}>
               Close
             </Button>
           </DialogFooter>
