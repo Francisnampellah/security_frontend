@@ -63,6 +63,15 @@ const styles = StyleSheet.create({
   label: {
     fontWeight: 'bold',
     marginRight: 5
+  },
+  urlList: {
+    marginLeft: 10,
+    marginBottom: 5
+  },
+  urlItem: {
+    fontSize: 11,
+    color: '#4b5563',
+    marginBottom: 3
   }
 });
 
@@ -98,12 +107,20 @@ export const TechnicalReportPDF = ({ alerts, targetInfo }: TechnicalReportPDFPro
             <Text style={styles.text}>{alert.description}</Text>
           </View>
 
-          <View style={styles.grid}>
-            <View style={styles.gridItem}>
-              <Text style={styles.text}>
-                <Text style={styles.label}>URL:</Text> {alert.url}
-              </Text>
+          {alert.urls && alert.urls.length > 0 && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Affected URLs</Text>
+              <View style={styles.urlList}>
+                {alert.urls.map((url, urlIndex) => (
+                  <Text key={urlIndex} style={styles.urlItem}>
+                    • {url}
+                  </Text>
+                ))}
+              </View>
             </View>
+          )}
+
+          <View style={styles.grid}>
             <View style={styles.gridItem}>
               <Text style={styles.text}>
                 <Text style={styles.label}>Method:</Text> {alert.method}

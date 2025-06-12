@@ -27,6 +27,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -204,45 +205,13 @@ export function ScanTable({ data = [], isLoading }: ScanTableProps) {
       </div>
 
       <Dialog open={!!technicalScan} onOpenChange={() => setTechnicalScan(null)}>
-        <DialogContent className="max-w-4xl max-h-[90vh]">
+        <DialogContent className="max-w-4xl h-[90vh] flex flex-col overflow-hidden">
           <DialogHeader className="pb-4 border-b">
-            <div className="flex items-center justify-between">
-              <DialogTitle className="text-xl font-semibold">Technical Security Report</DialogTitle>
-              {technicalScan && (
-                <div className="flex gap-2">
-                  <PDFDownloadLink
-                    document={
-                      <TechnicalReportPDF
-                        alerts={technicalScan.activeResults || []}
-                        targetInfo={{
-                          url: technicalScan.url,
-                          webServer: technicalScan.webServer,
-                          ipAddress: technicalScan.ipAddress
-                        }}
-                      />
-                    }
-                    fileName={`technical-report-${technicalScan.url.replace(/[^a-z0-9]/gi, '-')}.pdf`}
-                  >
-                    {({ loading }) => (
-                      <Button variant="outline" size="sm" disabled={loading}>
-                        {loading ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <>
-                            <Download className="h-4 w-4 mr-2" />
-                            Download Technical PDF
-                          </>
-                        )}
-                      </Button>
-                    )}
-                  </PDFDownloadLink>
-                </div>
-              )}
-            </div>
+            <DialogTitle className="text-xl font-semibold">Technical Security Report</DialogTitle>
           </DialogHeader>
-          <ScrollArea className="h-[calc(90vh-8rem)] pr-4">
+          <ScrollArea className="flex-1 pr-4 overflow-y-auto">
             {technicalScan && (
-              <div className="space-y-6">
+              <div className="space-y-6 py-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <h3 className="text-sm font-medium mb-2">Target Information</h3>
@@ -303,6 +272,26 @@ export function ScanTable({ data = [], isLoading }: ScanTableProps) {
                                 <p className="text-sm text-muted-foreground">
                                   {alert.description}
                                 </p>
+                                {alert.urls && alert.urls.length > 0 && (
+                                  <div className="mt-2">
+                                    <h5 className="text-sm font-medium mb-1">Affected URLs</h5>
+                                    <div className="space-y-1">
+                                      {alert.urls.map((url, urlIndex) => (
+                                        <div key={urlIndex} className="flex items-center gap-2">
+                                          <Globe className="h-3 w-3 text-muted-foreground" />
+                                          <a
+                                            href={url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-sm text-blue-500 hover:underline break-all"
+                                          >
+                                            {url}
+                                          </a>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
                                 {alert.solution && (
                                   <div className="mt-2">
                                     <h5 className="text-sm font-medium mb-1">Solution</h5>
@@ -344,6 +333,39 @@ export function ScanTable({ data = [], isLoading }: ScanTableProps) {
               </div>
             )}
           </ScrollArea>
+          <DialogFooter className="mt-4 pt-4 border-t flex justify-between">
+            {technicalScan && (
+              <PDFDownloadLink
+                document={
+                  <TechnicalReportPDF
+                    alerts={technicalScan.activeResults || []}
+                    targetInfo={{
+                      url: technicalScan.url,
+                      webServer: technicalScan.webServer,
+                      ipAddress: technicalScan.ipAddress
+                    }}
+                  />
+                }
+                fileName={`technical-report-${technicalScan.url.replace(/[^a-z0-9]/gi, '-')}.pdf`}
+              >
+                {({ loading }) => (
+                  <Button variant="outline" size="sm" disabled={loading}>
+                    {loading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <>
+                        <Download className="h-4 w-4 mr-2" />
+                        Download Technical PDF
+                      </>
+                    )}
+                  </Button>
+                )}
+              </PDFDownloadLink>
+            )}
+            <Button variant="destructive" onClick={() => setTechnicalScan(null)}>
+              Close
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 

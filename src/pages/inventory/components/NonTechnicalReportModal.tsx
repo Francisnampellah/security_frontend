@@ -6,6 +6,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -40,41 +41,11 @@ export function NonTechnicalReportModal({ scan, reports, onClose }: NonTechnical
 
   return (
     <Dialog open={!!scan && !!reports} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh]">
+      <DialogContent className="max-w-2xl h-[90vh] flex flex-col overflow-hidden">
         <DialogHeader className="pb-4 border-b">
-          <div className="flex items-center justify-between">
-            <DialogTitle className="text-xl font-semibold">Non-Technical Security Report</DialogTitle>
-            {scan && reports && (
-              <PDFDownloadLink
-                document={
-                  <NonTechnicalReportPDF
-                    reports={reports}
-                    targetInfo={{
-                      url: scan.url,
-                      webServer: scan.webServer,
-                      ipAddress: scan.ipAddress
-                    }}
-                  />
-                }
-                fileName={`non-technical-report-${scan.url.replace(/[^a-z0-9]/gi, '-')}.pdf`}
-              >
-                {({ loading }) => (
-                  <Button variant="outline" size="sm" disabled={loading}>
-                    {loading ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <>
-                        <Download className="h-4 w-4 mr-2" />
-                        Download PDF
-                      </>
-                    )}
-                  </Button>
-                )}
-              </PDFDownloadLink>
-            )}
-          </div>
+          <DialogTitle className="text-xl font-semibold">Non-Technical Security Report</DialogTitle>
         </DialogHeader>
-        <ScrollArea className="h-[calc(90vh-8rem)] pr-4">
+        <ScrollArea className="flex-1 pr-4 overflow-y-auto">
           <div className="space-y-6 py-4">
             {reports?.map((item, index) => (
               <div key={index} className="rounded-lg border bg-card p-6 space-y-4">
@@ -96,6 +67,39 @@ export function NonTechnicalReportModal({ scan, reports, onClose }: NonTechnical
             ))}
           </div>
         </ScrollArea>
+        <DialogFooter className="mt-4 pt-4 border-t flex justify-between">
+          {scan && reports && (
+            <PDFDownloadLink
+              document={
+                <NonTechnicalReportPDF
+                  reports={reports}
+                  targetInfo={{
+                    url: scan.url,
+                    webServer: scan.webServer,
+                    ipAddress: scan.ipAddress
+                  }}
+                />
+              }
+              fileName={`non-technical-report-${scan.url.replace(/[^a-z0-9]/gi, '-')}.pdf`}
+            >
+              {({ loading }) => (
+                <Button variant="outline" size="sm" disabled={loading}>
+                  {loading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <>
+                      <Download className="h-4 w-4 mr-2" />
+                      Download PDF
+                    </>
+                  )}
+                </Button>
+              )}
+            </PDFDownloadLink>
+          )}
+          <Button variant="destructive" onClick={onClose}>
+            Close
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   )

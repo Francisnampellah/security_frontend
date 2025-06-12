@@ -251,6 +251,7 @@ export interface ScanSession {
 export interface ScanAlert {
   id: string;
   url: string;
+  urls?: string[];
   name: string;
   risk: string;
   tags: {

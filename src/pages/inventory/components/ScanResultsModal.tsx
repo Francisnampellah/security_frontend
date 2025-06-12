@@ -1,8 +1,9 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { ScanAlert } from "@/type"
-import { AlertTriangle, Globe, Server, Shield } from "lucide-react"
+import { AlertTriangle, Globe, Server, Shield, Download } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 interface ScanResultsModalProps {
   isOpen: boolean
@@ -26,11 +27,11 @@ export function ScanResultsModal({ isOpen, onOpenChange, alerts }: ScanResultsMo
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh]">
+      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
         <DialogHeader className="pb-4 border-b">
           <DialogTitle className="text-xl font-semibold">Technical Security Report</DialogTitle>
         </DialogHeader>
-        <ScrollArea className="h-[calc(90vh-8rem)] pr-4">
+        <ScrollArea className="flex-1 pr-4">
           <div className="space-y-6 py-4">
             {alerts.map((alert) => (
               <div key={alert.id} className="rounded-lg border bg-card p-6 space-y-4">
@@ -96,6 +97,15 @@ export function ScanResultsModal({ isOpen, onOpenChange, alerts }: ScanResultsMo
             ))}
           </div>
         </ScrollArea>
+        <DialogFooter className="mt-4 pt-4 border-t flex justify-between">
+          <Button variant="outline" size="sm">
+            <Download className="h-4 w-4 mr-2" />
+            Download Report
+          </Button>
+          <Button variant="destructive" onClick={() => onOpenChange(false)}>
+            Close
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   )
