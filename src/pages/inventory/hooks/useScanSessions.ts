@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { startFullScan, getAllScans, getScanById } from "@/services/scan"
+import { startFullScan, getAllScans, getScanById, deleteScan } from "@/services/scan"
 import { ScanSession } from "@/type"
 import { useNotification } from "@/hooks/useNotification"
 
@@ -55,10 +55,27 @@ export const useScanSessions = () => {
     },
   })
 
+  // Delete a scan
+  const deleteScanMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const response = await deleteScan(id)
+      return response
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["scanSessions"] })
+      success("Scan deleted successfully")
+    },
+    onError: (err) => {
+      showError("Failed to delete scan")
+      console.error(err)
+    },
+  })
+
   return {
     scanSessions,
     isLoading,
     startScan,
     getScan,
+    deleteScan: deleteScanMutation,
   }
 } 

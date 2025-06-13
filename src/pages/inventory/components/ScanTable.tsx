@@ -50,7 +50,7 @@ export function ScanTable({ data = [], isLoading }: ScanTableProps) {
   const [technicalScan, setTechnicalScan] = useState<ScanSession | null>(null)
   const [nonTechnicalScan, setNonTechnicalScan] = useState<ScanSession | null>(null)
   const [selectedNonTechnical, setSelectedNonTechnical] = useState<NonTechnicalReport[] | null>(null)
-  const [isDeleting, setIsDeleting] = useState(false)
+  const { deleteScan } = useScanSessions()
 
   // Ensure data is always an array
   const scanSessions = Array.isArray(data) ? data : []
@@ -91,24 +91,10 @@ export function ScanTable({ data = [], isLoading }: ScanTableProps) {
 
   const handleDeleteScan = async (scanId: number) => {
     try {
-      setIsDeleting(true)
-      const response = await fetch(`/api/scans/${scanId}`, {
-        method: 'DELETE',
-      })
-      
-      if (!response.ok) {
-        throw new Error('Failed to delete scan')
-      }
-
-      // Close the modal and refresh the data
+      await deleteScan.mutateAsync(scanId)
       setTechnicalScan(null)
-      // You might want to add a callback prop to refresh the parent component's data
-      // onDelete?.(scanId)
     } catch (error) {
       console.error('Error deleting scan:', error)
-      // You might want to show an error toast here
-    } finally {
-      setIsDeleting(false)
     }
   }
 
@@ -197,42 +183,40 @@ export function ScanTable({ data = [], isLoading }: ScanTableProps) {
                     <TableCell>
                       <div className="flex items-center gap-2">
                         {showViewResult && (
-                          <>
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  className="h-8 w-8 p-0"
-                                >
-                                  <Shield className="h-4 w-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuLabel>View Report</DropdownMenuLabel>
-                                <DropdownMenuItem onClick={() => handleViewResults(session)}>
-                                  Technical Report
-                                </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => handleViewNonTechnical(session)}>
-                                  Non-Technical Report
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                            <Button
-                              variant="destructive"
-                              size="sm"
-                              className="h-8 w-8 p-0"
-                              onClick={() => handleDeleteScan(session.id)}
-                              disabled={isDeleting}
-                            >
-                              {isDeleting ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                              ) : (
-                                <Trash2 className="h-4 w-4" />
-                              )}
-                            </Button>
-                          </>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-8 w-8 p-0"
+                              >
+                                <Shield className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuLabel>View Report</DropdownMenuLabel>
+                              <DropdownMenuItem onClick={() => handleViewResults(session)}>
+                                Technical Report
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleViewNonTechnical(session)}>
+                                Non-Technical Report
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         )}
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          className="h-8 w-8 p-0"
+                          onClick={() => handleDeleteScan(session.id)}
+                          disabled={deleteScan.isPending}
+                        >
+                          {deleteScan.isPending ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Trash2 className="h-4 w-4" />
+                          )}
+                        </Button>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -406,9 +390,9 @@ export function ScanTable({ data = [], isLoading }: ScanTableProps) {
                     variant="destructive" 
                     size="sm"
                     onClick={() => handleDeleteScan(technicalScan.id)}
-                    disabled={isDeleting}
+                    disabled={deleteScan.isPending}
                   >
-                    {isDeleting ? (
+                    {deleteScan.isPending ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
                       <>

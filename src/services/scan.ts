@@ -78,6 +78,12 @@ export const getScanById = async (id: number): Promise<ScanSession> => {
   return response.data.data;
 };
 
+// Delete a scan session
+export const deleteScan = async (id: number): Promise<ApiResponse<void>> => {
+  const response = await axiosInstance.delete<ApiResponse<void>>(`/scan/scan/${id}`);
+  return response.data;
+};
+
 
 
 
