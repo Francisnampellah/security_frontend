@@ -6,6 +6,8 @@ import { useNotification } from '@/hooks/useNotification';
 export const AuthService = {
 
   
+
+  
   async login(email: string, password: string) {
     const response = await axiosInstance.post(`/auth/login`, {
       email,
@@ -25,10 +27,19 @@ export const AuthService = {
     localStorage.removeItem('refreshToken');
   },
 
-  async register(email: string, password: string) {
+  async register(name: string, email: string, password: string) {
     const response = await axiosInstance.post(`/auth/register`, {
+      name,
       email,
       password
+    });
+    return response.data;
+  },
+
+  async verifyOtp(email: string, otp: string) {
+    const response = await axiosInstance.post(`/auth/verify-email`, {
+      email,
+      otp
     });
     return response.data;
   },

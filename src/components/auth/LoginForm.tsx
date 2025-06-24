@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { Shield } from "lucide-react";
 import { Loader2 } from "lucide-react";
+import { useNotification } from '@/hooks/useNotification';
 
 
 const LoginForm = () => {
@@ -12,9 +13,42 @@ const LoginForm = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
   const [loading, setLoading] = useState(false);
+  const { error: notificationError } = useNotification();
+
+  const validateForm = () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      notificationError('Invalid email address.');
+      setError('Invalid email address.');
+      return false;
+    }
+
+    if (password.length < 6) {
+      notificationError('Password must be at least 6 characters long.');
+      setError('Password must be at least 6 characters long.');
+      return false;
+    }
+
+    const hasLetter = /[a-zA-Z]/.test(password);
+    const hasSymbol = /[^a-zA-Z0-9]/.test(password);
+
+    if (!hasLetter || !hasSymbol) {
+      notificationError('Password must contain at least one letter and one symbol.');
+      setError('Password must contain at least one letter and one symbol.');
+      return false;
+    }
+
+    setError('');
+    return true;
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     setLoading(true);
     e.preventDefault();
+    if (!validateForm()) {
+      setLoading(false);
+      return;
+    }
     try {
       await login(email, password);
       setLoading(false);
