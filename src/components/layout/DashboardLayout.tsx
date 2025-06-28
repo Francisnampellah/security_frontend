@@ -43,6 +43,11 @@ const navItems = [
     path: "/dashboard/inventory",
   },
   {
+    title: "User Management",
+    icon: Users,
+    path: "/dashboard/users",
+  },
+  {
     title: "Settings",
     icon: Settings,
     path: "/dashboard/settings",

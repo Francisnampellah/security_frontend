@@ -278,4 +278,6 @@ export interface ScanAlert {
   nonTechnicalDescription?: string;
 }
   
+export * from './user';
+  
     

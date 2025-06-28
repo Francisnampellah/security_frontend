@@ -14,6 +14,7 @@ import About from '@/pages/About';
 import Features from '@/pages/Features';
 import Contact from '@/pages/Contact';
 import SettingsPage from '@/pages/settings';
+import UserManagementPage from './pages/user';
 
 
 // import { AddMedicineDialog } from './components/pages/inventory/components/AddMedicine';
@@ -39,6 +40,7 @@ function App() {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/dashboard/inventory" element={<ScanSessionsPage />} />
               <Route path="/dashboard/settings" element={<SettingsPage />} />
+              <Route path="/dashboard/users" element={<UserManagementPage />} />
             </Route>
           </Routes>
           <Toaster richColors position="top-right" />
