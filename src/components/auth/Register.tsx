@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { AuthService } from '../../services/authService';
 import { Eye, Loader2, Shield } from "lucide-react";
 import { useNotification } from '@/hooks/useNotification';
+import { OtpVerification } from './OtpVerification';
 
 
 export const Register = () => {

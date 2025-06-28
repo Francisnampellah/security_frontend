@@ -4,6 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { Shield } from "lucide-react";
 import { Loader2 } from "lucide-react";
 import { useNotification } from '@/hooks/useNotification';
+import { OtpVerification } from './OtpVerification';
 
 
 const LoginForm = () => {
@@ -13,6 +14,7 @@ const LoginForm = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [showOtp, setShowOtp] = useState(false);
   const { error: notificationError } = useNotification();
 
   const validateForm = () => {
@@ -54,10 +56,24 @@ const LoginForm = () => {
       setLoading(false);
       navigate('/dashboard');
     } catch (err: any) {
-      setError(err.message || 'Failed to login');
+      if (err.response?.data?.error === 'Please verify your email before logging in.') {
+        notificationError('Please verify your email to continue.');
+        setShowOtp(true);
+      } else {
+        const errorMessage = err.response?.data?.error || err.message || 'Failed to login';
+        notificationError(errorMessage);
+        setError(errorMessage);
+      }
       setLoading(false);
     }
   };
+
+  if (showOtp) {
+    return <OtpVerification email={email} onSuccess={() => {
+      setShowOtp(false);
+      navigate('/login');
+    }} />;
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#d6edfa] to-[#eaf6ff]">

@@ -44,6 +44,13 @@ export const AuthService = {
     return response.data;
   },
 
+  async resendOtp(email: string) {
+    const response = await axiosInstance.post(`/auth/resend-otp`, {
+      email
+    });
+    return response.data;
+  },
+
   async refreshToken(refreshToken: string) {
     const response = await axiosInstance.post(`/auth/refresh`, {
       refreshToken
