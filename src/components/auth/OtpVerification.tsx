@@ -1,17 +1,24 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AuthService } from '../../services/authService';
 import { Eye, Loader2, Shield } from "lucide-react";
 import { useNotification } from '@/hooks/useNotification';
 
 
 // OTP Verification Component
-export const OtpVerification = ({ email, onSuccess }: { email: string; onSuccess: () => void }) => {
+export const OtpVerification = ({ email, providedOtp, onSuccess }: { email: string; providedOtp?: string; onSuccess: () => void }) => {
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const { success, error: notificationError } = useNotification();
   const [resendCooldown, setResendCooldown] = useState(0);
   const [resendLoading, setResendLoading] = useState(false);
+
+  // If providedOtp exists, pre-fill the OTP field
+  useEffect(() => {
+    if (providedOtp) {
+      setOtp(providedOtp);
+    }
+  }, [providedOtp]);
 
   const handleResendOtp = async () => {
     if (resendCooldown > 0) return;
@@ -59,8 +66,31 @@ export const OtpVerification = ({ email, onSuccess }: { email: string; onSuccess
         <div className="flex flex-col items-center mb-6">
           <Shield className="w-10 h-10 text-blue-400 mb-2" />
           <span className="text-3xl font-bold text-blue-500 mb-1">VulnGuard</span>
-          <span className="text-gray-600 text-lg">Enter the OTP sent to your email</span>
+          <span className="text-gray-600 text-lg">
+            {providedOtp ? 'Email verification code' : 'Enter the OTP sent to your email'}
+          </span>
         </div>
+        
+        {providedOtp && (
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-yellow-800">
+                  Email sending failed
+                </h3>
+                <div className="mt-2 text-sm text-yellow-700">
+                  <p>Your verification code is: <strong className="text-lg">{providedOtp}</strong></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        
         <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-lg p-8 space-y-5">
           <div>
             <label htmlFor="otp" className="block text-base font-medium text-gray-700 mb-1">OTP Code</label>

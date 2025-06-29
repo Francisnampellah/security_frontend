@@ -21,6 +21,7 @@ export const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showOtp, setShowOtp] = useState(false);
+  const [providedOtp, setProvidedOtp] = useState<string>('');
   const { success, error: notificationError } = useNotification();
 
   const validateForm = () => {
@@ -73,7 +74,7 @@ export const Register = () => {
     }
     
     try {
-      await AuthService.register(
+      const response = await AuthService.register(
         formData.name,
         formData.email,
         formData.password,
@@ -83,7 +84,16 @@ export const Register = () => {
         formData.businessLocation
       );
       setLoading(false);
-      success('Registration successful. Please check your email for the verification code.');
+      
+      // Check if email was sent successfully
+      if (response.data.emailSent) {
+        success('Registration successful. Please check your email for the verification code.');
+      } else {
+        // Email failed, show OTP to user
+        setProvidedOtp(response.data.otp);
+        success('Registration successful. Email sending failed. Please use the OTP provided below.');
+      }
+      
       setShowOtp(true);
     } catch (err: any) {
       notificationError(err.response?.data?.message || 'Registration failed');
@@ -93,7 +103,7 @@ export const Register = () => {
   };
 
   if (showOtp) {
-    return <OtpVerification email={formData.email} onSuccess={() => navigate('/login')} />;
+    return <OtpVerification email={formData.email} providedOtp={providedOtp} onSuccess={() => navigate('/login')} />;
   }
 
   return (
