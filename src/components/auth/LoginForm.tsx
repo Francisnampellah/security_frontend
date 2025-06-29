@@ -108,6 +108,14 @@ const LoginForm = () => {
               className="w-full px-4 py-3 border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 text-base"
             />
           </div>
+          <div className="text-right">
+            <a 
+              href="/forgot-password" 
+              className="text-sm text-blue-500 hover:underline font-medium"
+            >
+              Forgot Password?
+            </a>
+          </div>
           {error && <div className="text-red-500 text-sm text-center">{error}</div>}
           <button
             type="submit"

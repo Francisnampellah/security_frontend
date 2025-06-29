@@ -81,5 +81,21 @@ export const AuthService = {
       businessLocation
     });
     return response.data;
+  },
+
+  async forgotPassword(email: string) {
+    const response = await axiosInstance.post(`/auth/forgot-password`, {
+      email
+    });
+    return response;
+  },
+
+  async resetPassword(email: string, otp: string, newPassword: string) {
+    const response = await axiosInstance.post(`/auth/reset-password`, {
+      email,
+      otp,
+      newPassword
+    });
+    return response.data;
   }
 };

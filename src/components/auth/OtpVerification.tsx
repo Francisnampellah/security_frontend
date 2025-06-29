@@ -3,9 +3,22 @@ import { AuthService } from '../../services/authService';
 import { Eye, Loader2, Shield } from "lucide-react";
 import { useNotification } from '@/hooks/useNotification';
 
+interface OtpVerificationProps {
+  email: string;
+  providedOtp?: string;
+  onSuccess: () => void;
+  mode?: 'email-verification' | 'password-reset';
+  newPassword?: string;
+}
 
 // OTP Verification Component
-export const OtpVerification = ({ email, providedOtp, onSuccess }: { email: string; providedOtp?: string; onSuccess: () => void }) => {
+export const OtpVerification = ({ 
+  email, 
+  providedOtp, 
+  onSuccess, 
+  mode = 'email-verification',
+  newPassword 
+}: OtpVerificationProps) => {
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -24,7 +37,11 @@ export const OtpVerification = ({ email, providedOtp, onSuccess }: { email: stri
     if (resendCooldown > 0) return;
     setResendLoading(true);
     try {
-      await AuthService.resendOtp(email);
+      if (mode === 'password-reset') {
+        await AuthService.forgotPassword(email);
+      } else {
+        await AuthService.resendOtp(email);
+      }
       success('A new OTP has been sent to your email.');
       setResendCooldown(60);
       const interval = setInterval(() => {
@@ -48,9 +65,18 @@ export const OtpVerification = ({ email, providedOtp, onSuccess }: { email: stri
     setLoading(true);
     setError('');
     try {
-      // You need to implement AuthService.verifyOtp(email, otp)
-      await AuthService.verifyOtp(email, otp);
-      success('OTP verified successfully!');
+      if (mode === 'password-reset') {
+        // For password reset, we need email, OTP, and new password
+        if (!newPassword) {
+          throw new Error('New password is required for password reset');
+        }
+        await AuthService.resetPassword(email, otp, newPassword);
+        success('Password reset successful!');
+      } else {
+        // For email verification
+        await AuthService.verifyOtp(email, otp);
+        success('OTP verified successfully!');
+      }
       setLoading(false);
       onSuccess();
     } catch (err: any) {
@@ -60,6 +86,15 @@ export const OtpVerification = ({ email, providedOtp, onSuccess }: { email: stri
     }
   };
 
+  const getTitle = () => {
+    if (providedOtp) {
+      return 'Email verification code';
+    }
+    return mode === 'password-reset' 
+      ? 'Enter the reset code sent to your email' 
+      : 'Enter the OTP sent to your email';
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#d6edfa] to-[#eaf6ff]">
       <div className="w-full max-w-md mx-auto">
@@ -67,7 +102,7 @@ export const OtpVerification = ({ email, providedOtp, onSuccess }: { email: stri
           <Shield className="w-10 h-10 text-blue-400 mb-2" />
           <span className="text-3xl font-bold text-blue-500 mb-1">VulnGuard</span>
           <span className="text-gray-600 text-lg">
-            {providedOtp ? 'Email verification code' : 'Enter the OTP sent to your email'}
+            {getTitle()}
           </span>
         </div>
         
@@ -114,7 +149,7 @@ export const OtpVerification = ({ email, providedOtp, onSuccess }: { email: stri
                 <Loader2 className="h-4 w-4 animate-spin" />
               </div>
             ) : (
-              "Verify OTP"
+              mode === 'password-reset' ? "Reset Password" : "Verify OTP"
             )}
           </button>
           <div className="text-center text-sm text-gray-600">
