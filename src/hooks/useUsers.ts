@@ -37,7 +37,7 @@ export const useUsers = () => {
 
   // Update user
   const updateUser = useMutation({
-    mutationFn: async ({ id, userData }: { id: number; userData: UpdateUserDto }) => {
+    mutationFn: async ({ id, userData }: { id: string; userData: UpdateUserDto }) => {
       const response = await userService.updateUser(id, userData)
       return response
     },
@@ -53,7 +53,7 @@ export const useUsers = () => {
 
   // Delete user
   const deleteUser = useMutation({
-    mutationFn: async (id: number) => {
+    mutationFn: async (id: string) => {
       await userService.deleteUser(id)
     },
     onSuccess: () => {

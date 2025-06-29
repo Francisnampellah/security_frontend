@@ -1,10 +1,21 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { AuthService } from '../services/authService';
 
+interface Business {
+  id: string;
+  name: string;
+  phone: string;
+  description?: string;
+  location?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 interface User {
   id: string;
   email: string;
   role: string;
+  business?: Business;
 }
 
 interface AuthContextType {

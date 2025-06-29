@@ -4,44 +4,44 @@ import {
   CreateUserDto, 
   UpdateUserDto, 
   LoginDto, 
-  AuthResponse 
-} from '../../types/user';
-
+  AuthResponse,
+  UsersResponse
+} from '@/type';
 
 const userService = {
   // Register a new user
   async register(userData: CreateUserDto): Promise<User> {
-    const response = await axiosInstance.post(`/users/register`, userData);
+    const response = await axiosInstance.post(`auth/users/register`, userData);
     return response.data;
   },
 
   // Login user
   async login(credentials: LoginDto): Promise<AuthResponse> {
-    const response = await axiosInstance.post(`/users/login`, credentials);
+    const response = await axiosInstance.post(`auth/users/login`, credentials);
     return response.data;
   },
 
   // Get all users
   async getUsers(): Promise<User[]> {
-    const response = await axiosInstance.get(`/users`);
-    return response.data;
+    const response = await axiosInstance.get(`auth/users`);
+    return response.data.users;
   },
 
   // Get user by ID
-  async getUserById(id: number): Promise<User> {
-    const response = await axiosInstance.get(`/users/${id}`);
+  async getUserById(id: string): Promise<User> {
+    const response = await axiosInstance.get(`auth/users/${id}`);
     return response.data;
   },
 
   // Update user
-  async updateUser(id: number, userData: UpdateUserDto): Promise<User> {
-    const response = await axiosInstance.put(`/users/${id}`, userData);
+  async updateUser(id: string, userData: UpdateUserDto): Promise<User> {
+    const response = await axiosInstance.put(`auth/users/${id}`, userData);
     return response.data;
   },
 
   // Delete user
-  async deleteUser(id: number): Promise<void> {
-    await axiosInstance.delete(`/users/${id}`);
+  async deleteUser(id: string): Promise<void> {
+    await axiosInstance.delete(`auth/users/${id}`);
   },
 
   // Set auth token for authenticated requests

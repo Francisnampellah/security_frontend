@@ -18,7 +18,7 @@ export const AuthService = {
 
   async getCurrentUser() {
     const response = await axiosInstance.get(`/auth/me`);
-    return response.data;
+    return response.data.user;
   },
 
   async logout() {
@@ -27,11 +27,15 @@ export const AuthService = {
     localStorage.removeItem('refreshToken');
   },
 
-  async register(name: string, email: string, password: string) {
+  async register(name: string, email: string, password: string, businessName: string, businessPhone: string, businessDescription?: string, businessLocation?: string) {
     const response = await axiosInstance.post(`/auth/register`, {
       name,
       email,
-      password
+      password,
+      businessName,
+      businessPhone,
+      businessDescription,
+      businessLocation
     });
     return response.data;
   },
@@ -64,6 +68,17 @@ export const AuthService = {
     const response = await axiosInstance.post(`/auth/change-password`, {
       currentPassword,
       newPassword
+    });
+    return response.data;
+  },
+
+  async updateProfile(name: string, businessName: string, businessPhone: string, businessDescription?: string, businessLocation?: string) {
+    const response = await axiosInstance.put(`/auth/profile`, {
+      name,
+      businessName,
+      businessPhone,
+      businessDescription,
+      businessLocation
     });
     return response.data;
   }

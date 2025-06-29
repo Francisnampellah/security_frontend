@@ -15,6 +15,7 @@ import Features from '@/pages/Features';
 import Contact from '@/pages/Contact';
 import SettingsPage from '@/pages/settings';
 import UserManagementPage from './pages/user';
+import Profile from './pages/dashboard/Profile';
 
 
 // import { AddMedicineDialog } from './components/pages/inventory/components/AddMedicine';
@@ -39,7 +40,12 @@ function App() {
             <Route element={<ProtectedRoute />}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/dashboard/inventory" element={<ScanSessionsPage />} />
+              <Route path="/dashboard/profile" element={<Profile />} />
               <Route path="/dashboard/settings" element={<SettingsPage />} />
+            </Route>
+
+            {/* Admin-only routes */}
+            <Route element={<ProtectedRoute adminOnly={true} />}>
               <Route path="/dashboard/users" element={<UserManagementPage />} />
             </Route>
           </Routes>

@@ -3,7 +3,8 @@
 import type * as React from "react"
 import { useState, useEffect } from "react"
 import { Link, useLocation } from "react-router-dom"
-import { LayoutDashboard, Package, Users, ShoppingCart, DollarSign, BadgeDollarSign, Pill, Shield, AlertTriangle, FileCode, Database, Lock, Globe, Bug, Settings, Moon, Sun, ChevronRight, LogOut, Calendar, FileText, HelpCircle } from 'lucide-react'
+import { LayoutDashboard, Package, Users, ShoppingCart, DollarSign, BadgeDollarSign, Pill, Shield, AlertTriangle, FileCode, Database, Lock, Globe, Bug, Settings, Moon, Sun, ChevronRight, LogOut, Calendar, FileText, HelpCircle, User } from 'lucide-react'
+import { useAuth } from "@/contexts/AuthContext"
 
 import {
   Sidebar,
@@ -31,34 +32,60 @@ interface DashboardLayoutProps {
   children: React.ReactNode
 }
 
-const navItems = [
-  {
-    title: "Dashboard",
-    icon: LayoutDashboard,
-    path: "/dashboard",
-  },
-  {
-    title: "Scans",
-    icon: Calendar,
-    path: "/dashboard/inventory",
-  },
-  {
-    title: "User Management",
-    icon: Users,
-    path: "/dashboard/users",
-  },
-  {
-    title: "Settings",
-    icon: Settings,
-    path: "/dashboard/settings",
-  }
-]
-
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const location = useLocation()
+  const { user } = useAuth()
   const [isDarkMode, setIsDarkMode] = useState(false)
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [activeSection, setActiveSection] = useState("main")
+
+  // Debug logging
+  console.log("DashboardLayout - User:", user)
+  console.log("DashboardLayout - User role:", user?.role)
+
+  // Define navigation items with role-based visibility
+  const navItems = [
+    {
+      title: "Dashboard",
+      icon: LayoutDashboard,
+      path: "/dashboard",
+      showForAll: true
+    },
+    {
+      title: "Scans",
+      icon: Calendar,
+      path: "/dashboard/inventory",
+      showForAll: true
+    },
+    {
+      title: "Profile",
+      icon: User,
+      path: "/dashboard/profile",
+      showForAll: true
+    },
+    {
+      title: "User Management",
+      icon: Users,
+      path: "/dashboard/users",
+      showForAll: false, // Only show for admins
+      adminOnly: true
+    },
+    {
+      title: "Settings",
+      icon: Settings,
+      path: "/dashboard/settings",
+      showForAll: true
+    }
+  ]
+
+  // Filter navigation items based on user role
+  const filteredNavItems = navItems.filter(item => {
+    if (item.showForAll) return true
+    if (item.adminOnly && user?.role === 'ADMIN') return true
+    return false
+  })
+
+  console.log("DashboardLayout - Filtered nav items:", filteredNavItems)
 
   // Toggle dark mode
   useEffect(() => {
@@ -78,7 +105,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         </div>
         <nav className="flex-1 py-6 px-2">
           <ul className="space-y-1">
-            {navItems.map((item) => {
+            {filteredNavItems.map((item) => {
               const isActive = location.pathname === item.path || (item.path !== "/dashboard" && location.pathname.startsWith(item.path));
               return (
                 <li key={item.path}>

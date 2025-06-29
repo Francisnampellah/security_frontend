@@ -12,6 +12,10 @@ export const Register = () => {
     name: '',
     email: '',
     password: '',
+    businessName: '',
+    businessPhone: '',
+    businessDescription: '',
+    businessLocation: '',
   });
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -20,7 +24,7 @@ export const Register = () => {
   const { success, error: notificationError } = useNotification();
 
   const validateForm = () => {
-    const { email, password } = formData;
+    const { email, password, businessName, businessPhone } = formData;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       notificationError('Invalid email address.');
@@ -43,6 +47,18 @@ export const Register = () => {
       return false;
     }
 
+    if (!businessName.trim()) {
+      notificationError('Business name is required.');
+      setError('Business name is required.');
+      return false;
+    }
+
+    if (!businessPhone.trim()) {
+      notificationError('Business phone is required.');
+      setError('Business phone is required.');
+      return false;
+    }
+
     setError('');
     return true;
   }
@@ -60,7 +76,11 @@ export const Register = () => {
       await AuthService.register(
         formData.name,
         formData.email,
-        formData.password
+        formData.password,
+        formData.businessName,
+        formData.businessPhone,
+        formData.businessDescription,
+        formData.businessLocation
       );
       setLoading(false);
       success('Registration successful. Please check your email for the verification code.');
@@ -128,6 +148,64 @@ export const Register = () => {
               <Eye className="h-5 w-5 text-gray-400" />
             </button>
           </div>
+          
+          {/* Business Information Section */}
+          <div className="border-t pt-4">
+            <h3 className="text-lg font-medium text-gray-900 mb-4">Business Information</h3>
+            
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="businessName" className="block text-base font-medium text-gray-700 mb-1">Business Name *</label>
+                <input
+                  id="businessName"
+                  type="text"
+                  placeholder="Enter your business name"
+                  value={formData.businessName}
+                  onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
+                  required
+                  className="w-full px-4 py-3 border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 text-base"
+                />
+              </div>
+              
+              <div>
+                <label htmlFor="businessPhone" className="block text-base font-medium text-gray-700 mb-1">Business Phone *</label>
+                <input
+                  id="businessPhone"
+                  type="tel"
+                  placeholder="Enter your business phone"
+                  value={formData.businessPhone}
+                  onChange={(e) => setFormData({ ...formData, businessPhone: e.target.value })}
+                  required
+                  className="w-full px-4 py-3 border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 text-base"
+                />
+              </div>
+              
+              <div>
+                <label htmlFor="businessDescription" className="block text-base font-medium text-gray-700 mb-1">Business Description</label>
+                <textarea
+                  id="businessDescription"
+                  placeholder="Describe your business (optional)"
+                  value={formData.businessDescription}
+                  onChange={(e) => setFormData({ ...formData, businessDescription: e.target.value })}
+                  rows={3}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 text-base resize-none"
+                />
+              </div>
+              
+              <div>
+                <label htmlFor="businessLocation" className="block text-base font-medium text-gray-700 mb-1">Business Location</label>
+                <input
+                  id="businessLocation"
+                  type="text"
+                  placeholder="Enter your business location (optional)"
+                  value={formData.businessLocation}
+                  onChange={(e) => setFormData({ ...formData, businessLocation: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 text-base"
+                />
+              </div>
+            </div>
+          </div>
+          
           {error && <div className="text-red-500 text-sm text-center">{error}</div>}
           <button
             type="submit"

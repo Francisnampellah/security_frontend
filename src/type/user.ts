@@ -1,10 +1,14 @@
+import { Business } from './business';
+
 export interface User {
-  id: number;
+  id: string;
   name: string;
   email: string;
   role: string;
+  isEmailVerified: boolean;
   createdAt: string;
   updatedAt: string;
+  business?: Business;
 }
 
 export interface CreateUserDto {
@@ -12,6 +16,10 @@ export interface CreateUserDto {
   email: string;
   password: string;
   role: string;
+  businessName?: string;
+  businessPhone?: string;
+  businessDescription?: string;
+  businessLocation?: string;
 }
 
 export interface UpdateUserDto {
@@ -29,4 +37,8 @@ export interface LoginDto {
 export interface AuthResponse {
   token: string;
   user: User;
+}
+
+export interface UsersResponse {
+  users: User[];
 } 

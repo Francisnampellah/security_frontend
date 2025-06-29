@@ -1,9 +1,12 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 
-const ProtectedRoute = () => {
-  const { user, isLoading, token } = useAuth();
+interface ProtectedRouteProps {
+  adminOnly?: boolean;
+}
 
+const ProtectedRoute = ({ adminOnly = false }: ProtectedRouteProps) => {
+  const { user, isLoading, token } = useAuth();
 
   console.log("ProtectedRoute", user, isLoading, token);
 
@@ -11,7 +14,15 @@ const ProtectedRoute = () => {
     return <div>Loading...</div>;
   }
 
-  return token ? <Outlet /> : "" ;
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (adminOnly && user?.role !== 'ADMIN') {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <Outlet />;
 };
 
 export default ProtectedRoute;
