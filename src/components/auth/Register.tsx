@@ -105,30 +105,34 @@ export const Register = () => {
           <span className="text-gray-600 text-lg">Create your account to get started</span>
         </div>
         <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-lg p-8 space-y-5">
-          <div>
-            <label htmlFor="username" className="block text-base font-medium text-gray-700 mb-1">Username</label>
-            <input
-              id="username"
-              type="text"
-              placeholder="Enter your username"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              required
-              className="w-full px-4 py-3 border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 text-base"
-            />
+          {/* Personal Information Section */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="username" className="block text-base font-medium text-gray-700 mb-1">Username</label>
+              <input
+                id="username"
+                type="text"
+                placeholder="Enter your username"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                required
+                className="w-full px-4 py-3 border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 text-base"
+              />
+            </div>
+            <div>
+              <label htmlFor="email" className="block text-base font-medium text-gray-700 mb-1">Email</label>
+              <input
+                id="email"
+                type="email"
+                placeholder="Enter your email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                required
+                className="w-full px-4 py-3 border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 text-base"
+              />
+            </div>
           </div>
-          <div>
-            <label htmlFor="email" className="block text-base font-medium text-gray-700 mb-1">Email</label>
-            <input
-              id="email"
-              type="email"
-              placeholder="Enter your email"
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              required
-              className="w-full px-4 py-3 border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 text-base"
-            />
-          </div>
+          
           <div className="relative">
             <label htmlFor="password" className="block text-base font-medium text-gray-700 mb-1">Password</label>
             <input
@@ -153,7 +157,7 @@ export const Register = () => {
           <div className="border-t pt-4">
             <h3 className="text-lg font-medium text-gray-900 mb-4">Business Information</h3>
             
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="businessName" className="block text-base font-medium text-gray-700 mb-1">Business Name *</label>
                 <input
@@ -179,19 +183,9 @@ export const Register = () => {
                   className="w-full px-4 py-3 border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 text-base"
                 />
               </div>
-              
-              <div>
-                <label htmlFor="businessDescription" className="block text-base font-medium text-gray-700 mb-1">Business Description</label>
-                <textarea
-                  id="businessDescription"
-                  placeholder="Describe your business (optional)"
-                  value={formData.businessDescription}
-                  onChange={(e) => setFormData({ ...formData, businessDescription: e.target.value })}
-                  rows={3}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 text-base resize-none"
-                />
-              </div>
-              
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               <div>
                 <label htmlFor="businessLocation" className="block text-base font-medium text-gray-700 mb-1">Business Location</label>
                 <input
@@ -201,6 +195,18 @@ export const Register = () => {
                   value={formData.businessLocation}
                   onChange={(e) => setFormData({ ...formData, businessLocation: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 text-base"
+                />
+              </div>
+              
+              <div>
+                <label htmlFor="businessDescription" className="block text-base font-medium text-gray-700 mb-1">Business Description</label>
+                <textarea
+                  id="businessDescription"
+                  placeholder="Describe your business (optional)"
+                  value={formData.businessDescription}
+                  onChange={(e) => setFormData({ ...formData, businessDescription: e.target.value })}
+                  rows={1}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 text-base resize-none"
                 />
               </div>
             </div>
