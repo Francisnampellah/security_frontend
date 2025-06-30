@@ -85,13 +85,14 @@ export const Register = () => {
       );
       setLoading(false);
       
-      // Check if email was sent successfully
-      if (response.data.emailSent) {
-        success('Registration successful. Please check your email for the verification code.');
-      } else {
+      // Always show OTP screen, regardless of email status
+      if (!response.data.emailSent) {
         // Email failed, show OTP to user
         setProvidedOtp(response.data.otp);
         success('Registration successful. Email sending failed. Please use the OTP provided below.');
+      } else {
+        // Email sent successfully
+        success('Registration successful. Please check your email for the verification code.');
       }
       
       setShowOtp(true);

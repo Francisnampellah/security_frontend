@@ -57,8 +57,9 @@ const LoginForm = () => {
       navigate('/dashboard');
     } catch (err: any) {
       if (err.response?.data?.error === 'Please verify your email before logging in.') {
-        notificationError('Please verify your email to continue.');
+        // User exists but email is not verified - show OTP screen
         setShowOtp(true);
+        setError(''); // Clear any previous errors
       } else {
         const errorMessage = err.response?.data?.error || err.message || 'Failed to login';
         notificationError(errorMessage);
@@ -68,11 +69,21 @@ const LoginForm = () => {
     }
   };
 
+  const handleOtpSuccess = async () => {
+    // After successful OTP verification, try to login again
+    try {
+      await login(email, password);
+      navigate('/dashboard');
+    } catch (err: any) {
+      const errorMessage = err.response?.data?.error || err.message || 'Failed to login';
+      notificationError(errorMessage);
+      setError(errorMessage);
+      setShowOtp(false); // Go back to login form if login still fails
+    }
+  };
+
   if (showOtp) {
-    return <OtpVerification email={email} onSuccess={() => {
-      setShowOtp(false);
-      navigate('/login');
-    }} />;
+    return <OtpVerification email={email} onSuccess={handleOtpSuccess} />;
   }
 
   return (
