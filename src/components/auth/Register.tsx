@@ -86,9 +86,9 @@ export const Register = () => {
       setLoading(false);
       
       // Always show OTP screen, regardless of email status
-      if (!response.data.emailSent) {
+      if (!response.emailSent) {
         // Email failed, show OTP to user
-        setProvidedOtp(response.data.otp);
+        setProvidedOtp(response.otp);
         success('Registration successful. Email sending failed. Please use the OTP provided below.');
       } else {
         // Email sent successfully
