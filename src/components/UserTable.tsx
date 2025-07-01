@@ -5,13 +5,14 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { useUsers } from "@/hooks/useUsers"
 import { useState } from "react"
 import { Badge } from "@/components/ui/badge"
-import { Edit, Trash2 } from "lucide-react"
+import { Edit, Trash2, AlertTriangle } from "lucide-react"
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogFooter,
 } from "@/components/ui/dialog"
 import {
   Form,
@@ -22,9 +23,13 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { useForm } from "react-hook-form"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
 
 interface UserTableProps {
   data?: User[] | null
@@ -38,10 +43,18 @@ interface EditUserForm {
   isEmailVerified: boolean
 }
 
+const deleteUserSchema = z.object({
+  reason: z.string().min(10, "Please provide a detailed reason (at least 10 characters)")
+})
+
+type DeleteUserForm = z.infer<typeof deleteUserSchema>
+
 export function UserTable({ data = [], isLoading }: UserTableProps) {
   const { deleteUser, updateUser } = useUsers()
   const [editingUser, setEditingUser] = useState<User | null>(null)
+  const [deletingUser, setDeletingUser] = useState<User | null>(null)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
 
   const form = useForm<EditUserForm>({
     defaultValues: {
@@ -49,6 +62,13 @@ export function UserTable({ data = [], isLoading }: UserTableProps) {
       email: "",
       role: "USER",
       isEmailVerified: false,
+    },
+  })
+
+  const deleteForm = useForm<DeleteUserForm>({
+    resolver: zodResolver(deleteUserSchema),
+    defaultValues: {
+      reason: "",
     },
   })
 
@@ -79,13 +99,32 @@ export function UserTable({ data = [], isLoading }: UserTableProps) {
     }
   }
 
-  const handleDeleteUser = async (userId: string) => {
+  const handleDeleteClick = (user: User) => {
+    setDeletingUser(user)
+    deleteForm.reset()
+    setDeleteDialogOpen(true)
+  }
+
+  const handleDeleteUser = async (data: DeleteUserForm) => {
+    if (!deletingUser) return
+
     try {
-      await deleteUser.mutateAsync(userId)
-      setEditingUser(null)
+      // Note: The reason is not sent anywhere, it's just for confirmation
+      console.log('Deletion reason:', data.reason)
+      
+      await deleteUser.mutateAsync(deletingUser.id)
+      setDeleteDialogOpen(false)
+      setDeletingUser(null)
+      deleteForm.reset()
     } catch (error) {
       console.error('Error deleting user:', error)
     }
+  }
+
+  const handleCancelDelete = () => {
+    setDeleteDialogOpen(false)
+    setDeletingUser(null)
+    deleteForm.reset()
   }
 
   if (isLoading) {
@@ -160,7 +199,7 @@ export function UserTable({ data = [], isLoading }: UserTableProps) {
                       <Button 
                         variant="destructive" 
                         size="sm" 
-                        onClick={() => handleDeleteUser(user.id)}
+                        onClick={() => handleDeleteClick(user)}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -264,6 +303,67 @@ export function UserTable({ data = [], isLoading }: UserTableProps) {
                   {updateUser.isPending ? "Updating..." : "Update User"}
                 </Button>
               </div>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete User Dialog */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-destructive">
+              <AlertTriangle className="h-5 w-5" />
+              Delete User
+            </DialogTitle>
+          </DialogHeader>
+          
+          {deletingUser && (
+            <Alert variant="destructive">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertDescription>
+                You are about to delete user <strong>{deletingUser.name}</strong> ({deletingUser.email}). 
+                This action cannot be undone. Please provide a reason for this deletion.
+              </AlertDescription>
+            </Alert>
+          )}
+
+          <Form {...deleteForm}>
+            <form onSubmit={deleteForm.handleSubmit(handleDeleteUser)} className="space-y-4">
+              <FormField
+                control={deleteForm.control}
+                name="reason"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Reason for Deletion *</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        {...field} 
+                        placeholder="Please provide a detailed reason for deleting this user..."
+                        rows={4}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <DialogFooter>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleCancelDelete}
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  type="submit" 
+                  variant="destructive"
+                  disabled={deleteUser.isPending}
+                >
+                  {deleteUser.isPending ? "Deleting..." : "Delete User"}
+                </Button>
+              </DialogFooter>
             </form>
           </Form>
         </DialogContent>

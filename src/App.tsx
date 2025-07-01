@@ -44,7 +44,6 @@ function App() {
 
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/dashboard/inventory" element={<ScanSessionsPage />} />
-              <Route path="/dashboard/profile" element={<Profile />} />
               <Route path="/dashboard/settings" element={<SettingsPage />} />
 
             </Route>

@@ -57,12 +57,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       path: "/dashboard/inventory",
       showForAll: true
     },
-    {
-      title: "Profile",
-      icon: User,
-      path: "/dashboard/profile",
-      showForAll: true
-    },
+
     {
       title: "User Management",
       icon: Users,

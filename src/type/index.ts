@@ -276,6 +276,7 @@ export interface ScanAlert {
   inputVector: string;
   sourceMessageId: number;
   nonTechnicalDescription?: string;
+  swahiliDescription?: string;
 }
   
 export * from './user';

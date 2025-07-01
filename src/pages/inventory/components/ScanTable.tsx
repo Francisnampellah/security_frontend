@@ -34,8 +34,15 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { PDFDownloadLink } from '@react-pdf/renderer'
 import { TechnicalReportPDF } from "@/components/reports/TechnicalReportPDF"
 import { NonTechnicalReportModal } from "./NonTechnicalReportModal"
+import { SwahiliReportModal } from "./SwahiliReportModal"
 
 interface NonTechnicalReport {
+  name: string;
+  risk: string;
+  description: string;
+}
+
+interface SwahiliReport {
   name: string;
   risk: string;
   description: string;
@@ -49,7 +56,9 @@ interface ScanTableProps {
 export function ScanTable({ data = [], isLoading }: ScanTableProps) {
   const [technicalScan, setTechnicalScan] = useState<ScanSession | null>(null)
   const [nonTechnicalScan, setNonTechnicalScan] = useState<ScanSession | null>(null)
+  const [swahiliScan, setSwahiliScan] = useState<ScanSession | null>(null)
   const [selectedNonTechnical, setSelectedNonTechnical] = useState<NonTechnicalReport[] | null>(null)
+  const [selectedSwahili, setSelectedSwahili] = useState<SwahiliReport[] | null>(null)
   const { deleteScan } = useScanSessions()
 
   // Ensure data is always an array
@@ -58,7 +67,9 @@ export function ScanTable({ data = [], isLoading }: ScanTableProps) {
   const handleViewResults = (session: ScanSession) => {
     setTechnicalScan(session)
     setNonTechnicalScan(null)
+    setSwahiliScan(null)
     setSelectedNonTechnical(null)
+    setSelectedSwahili(null)
   }
 
   const handleViewNonTechnical = (session: ScanSession) => {
@@ -73,6 +84,25 @@ export function ScanTable({ data = [], isLoading }: ScanTableProps) {
       setNonTechnicalScan(session);
       setSelectedNonTechnical(nonTechnicalDescriptions);
       setTechnicalScan(null);
+      setSwahiliScan(null);
+      setSelectedSwahili(null);
+    }
+  }
+
+  const handleViewSwahili = (session: ScanSession) => {
+    if (session.activeResults && session.activeResults.length > 0) {
+      const swahiliDescriptions = session.activeResults
+        .filter(alert => alert.swahiliDescription)
+        .map(alert => ({
+          name: alert.name,
+          risk: alert.risk,
+          description: alert.swahiliDescription || ''
+        }));
+      setSwahiliScan(session);
+      setSelectedSwahili(swahiliDescriptions);
+      setTechnicalScan(null);
+      setNonTechnicalScan(null);
+      setSelectedNonTechnical(null);
     }
   }
 
@@ -200,6 +230,9 @@ export function ScanTable({ data = [], isLoading }: ScanTableProps) {
                               </DropdownMenuItem>
                               <DropdownMenuItem onClick={() => handleViewNonTechnical(session)}>
                                 Non-Technical Report
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleViewSwahili(session)}>
+                                Swahili Report
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
@@ -417,6 +450,15 @@ export function ScanTable({ data = [], isLoading }: ScanTableProps) {
         onClose={() => {
           setNonTechnicalScan(null);
           setSelectedNonTechnical(null);
+        }}
+      />
+
+      <SwahiliReportModal
+        scan={swahiliScan}
+        reports={selectedSwahili}
+        onClose={() => {
+          setSwahiliScan(null);
+          setSelectedSwahili(null);
         }}
       />
     </>
