@@ -4,25 +4,16 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import type { ScanSession } from "@/type";
 
 interface ScanOverviewProps {
-  scanSessions: ScanSession[];
+  totalScans: number;
+  totalVulnerabilities: number;
+  recentScans: ScanSession[];
 }
 
-export const ScanOverview: React.FC<ScanOverviewProps> = ({ scanSessions }) => {
-  const totalScans = scanSessions.length;
-  
-  // Count unique vulnerabilities using reference key (combination of sorted tags)
-  
-  const uniqueVulnerabilities = new Set(
-    scanSessions.flatMap(session => 
-      session.activeResults?.map(result => {
-        const referenceKey = Object.keys(result.tags).sort().join(',');
-        return referenceKey;
-      }) || []
-    )
-  ).size;
-
-  const successfulScans = scanSessions.filter(session => 
-    session.spiderStatus === 100 && session.activeStatus === 100).length;
+export const ScanOverview: React.FC<ScanOverviewProps> = ({ totalScans, totalVulnerabilities, recentScans }) => {
+  const safeRecentScans = Array.isArray(recentScans) ? recentScans : [];
+  const successfulScans = safeRecentScans.filter(session =>
+    session.spiderStatus === 100 && session.activeStatus === 100
+  ).length;
 
   return (
     <div className="space-y-6">
@@ -40,7 +31,7 @@ export const ScanOverview: React.FC<ScanOverviewProps> = ({ scanSessions }) => {
             <CardTitle className="text-sm font-medium">Unique Vulnerabilities</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{uniqueVulnerabilities}</div>
+            <div className="text-2xl font-bold">{totalVulnerabilities}</div>
           </CardContent>
         </Card>
         <Card>
@@ -68,7 +59,7 @@ export const ScanOverview: React.FC<ScanOverviewProps> = ({ scanSessions }) => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {scanSessions.slice(0, 5).map((session) => (
+              {safeRecentScans.slice(0, 5).map((session) => (
                 <TableRow key={session.id}>
                   <TableCell>{session.url}</TableCell>
                   <TableCell>{new Date(session.startedAt).toLocaleDateString()}</TableCell>
@@ -83,7 +74,7 @@ export const ScanOverview: React.FC<ScanOverviewProps> = ({ scanSessions }) => {
                        'in progress'}
                     </span>
                   </TableCell>
-                  <TableCell>{session.activeResults?.length || 0}</TableCell>
+                  <TableCell>{Array.isArray(session.activeResults) ? session.activeResults.length : 0}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
