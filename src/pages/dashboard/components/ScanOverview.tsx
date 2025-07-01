@@ -103,7 +103,7 @@ export const ScanOverview: React.FC<ScanOverviewProps> = ({
           <CardContent>
             <div className="text-2xl font-bold">{totalVulnerabilities}</div>
             <p className="text-xs text-muted-foreground">
-              {uniqueVulnerabilities.size} unique types
+              {uniqueVulnerabilities.size}  types
             </p>
           </CardContent>
         </Card>
