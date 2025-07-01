@@ -16,6 +16,7 @@ import Contact from '@/pages/Contact';
 import SettingsPage from '@/pages/settings';
 import UserManagementPage from './pages/user';
 import Profile from './pages/dashboard/Profile';
+import { ForgotPassword } from './components/auth/ForgotPassword';
 
 
 // import { AddMedicineDialog } from './components/pages/inventory/components/AddMedicine';
@@ -28,20 +29,24 @@ function App() {
       <AuthProvider>
         <Router>
           <Routes>
+            
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
             <Route path="/features" element={<Features />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/inventory" element={<ScanSessionsPage />} />
             <Route path="/login" element={<LoginForm />} />
             <Route path="/register" element={<Register />} />
 
             <Route element={<ProtectedRoute />}>
+
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/dashboard/inventory" element={<ScanSessionsPage />} />
               <Route path="/dashboard/profile" element={<Profile />} />
               <Route path="/dashboard/settings" element={<SettingsPage />} />
+
             </Route>
 
             {/* Admin-only routes */}

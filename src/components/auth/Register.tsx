@@ -12,10 +12,9 @@ export const Register = () => {
     name: '',
     email: '',
     password: '',
-    businessName: '',
+    confirmPassword: '',
     businessPhone: '',
-    businessDescription: '',
-    businessLocation: '',
+    businessName: 'Default Company',
   });
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -25,7 +24,7 @@ export const Register = () => {
   const { success, error: notificationError } = useNotification();
 
   const validateForm = () => {
-    const { email, password, businessName, businessPhone } = formData;
+    const { email, password, confirmPassword, businessPhone } = formData;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       notificationError('Invalid email address.');
@@ -48,15 +47,15 @@ export const Register = () => {
       return false;
     }
 
-    if (!businessName.trim()) {
-      notificationError('Business name is required.');
-      setError('Business name is required.');
+    if (password !== confirmPassword) {
+      notificationError('Passwords do not match.');
+      setError('Passwords do not match.');
       return false;
     }
 
     if (!businessPhone.trim()) {
-      notificationError('Business phone is required.');
-      setError('Business phone is required.');
+      notificationError('Phone number is required.');
+      setError('Phone number is required.');
       return false;
     }
 
@@ -80,8 +79,8 @@ export const Register = () => {
         formData.password,
         formData.businessName,
         formData.businessPhone,
-        formData.businessDescription,
-        formData.businessLocation
+        '',
+        ''
       );
       setLoading(false);
       
@@ -143,7 +142,6 @@ export const Register = () => {
               />
             </div>
           </div>
-          
           <div className="relative">
             <label htmlFor="password" className="block text-base font-medium text-gray-700 mb-1">Password</label>
             <input
@@ -163,66 +161,30 @@ export const Register = () => {
               <Eye className="h-5 w-5 text-gray-400" />
             </button>
           </div>
-          
-          {/* Business Information Section */}
-          <div className="border-t pt-4">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Business Information</h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="businessName" className="block text-base font-medium text-gray-700 mb-1">Business Name *</label>
-                <input
-                  id="businessName"
-                  type="text"
-                  placeholder="Enter your business name"
-                  value={formData.businessName}
-                  onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
-                  required
-                  className="w-full px-4 py-3 border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 text-base"
-                />
-              </div>
-              
-              <div>
-                <label htmlFor="businessPhone" className="block text-base font-medium text-gray-700 mb-1">Business Phone *</label>
-                <input
-                  id="businessPhone"
-                  type="tel"
-                  placeholder="Enter your business phone"
-                  value={formData.businessPhone}
-                  onChange={(e) => setFormData({ ...formData, businessPhone: e.target.value })}
-                  required
-                  className="w-full px-4 py-3 border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 text-base"
-                />
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-              <div>
-                <label htmlFor="businessLocation" className="block text-base font-medium text-gray-700 mb-1">Business Location</label>
-                <input
-                  id="businessLocation"
-                  type="text"
-                  placeholder="Enter your business location (optional)"
-                  value={formData.businessLocation}
-                  onChange={(e) => setFormData({ ...formData, businessLocation: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 text-base"
-                />
-              </div>
-              
-              <div>
-                <label htmlFor="businessDescription" className="block text-base font-medium text-gray-700 mb-1">Business Description</label>
-                <textarea
-                  id="businessDescription"
-                  placeholder="Describe your business (optional)"
-                  value={formData.businessDescription}
-                  onChange={(e) => setFormData({ ...formData, businessDescription: e.target.value })}
-                  rows={1}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 text-base resize-none"
-                />
-              </div>
-            </div>
+          <div>
+            <label htmlFor="confirmPassword" className="block text-base font-medium text-gray-700 mb-1">Confirm Password</label>
+            <input
+              id="confirmPassword"
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Confirm your password"
+              value={formData.confirmPassword}
+              onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+              required
+              className="w-full px-4 py-3 border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 text-base pr-10"
+            />
           </div>
-          
+          <div>
+            <label htmlFor="businessPhone" className="block text-base font-medium text-gray-700 mb-1">Phone Number</label>
+            <input
+              id="businessPhone"
+              type="tel"
+              placeholder="Enter your phone number"
+              value={formData.businessPhone}
+              onChange={(e) => setFormData({ ...formData, businessPhone: e.target.value })}
+              required
+              className="w-full px-4 py-3 border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 text-base"
+            />
+          </div>
           {error && <div className="text-red-500 text-sm text-center">{error}</div>}
           <button
             type="submit"

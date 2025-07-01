@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { Shield } from "lucide-react";
+import { Shield, Eye } from "lucide-react";
 import { Loader2 } from "lucide-react";
 import { useNotification } from '@/hooks/useNotification';
 import { OtpVerification } from './OtpVerification';
@@ -16,6 +16,7 @@ const LoginForm = () => {
   const [loading, setLoading] = useState(false);
   const [showOtp, setShowOtp] = useState(false);
   const { error: notificationError } = useNotification();
+  const [showPassword, setShowPassword] = useState(false);
 
   const validateForm = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -107,17 +108,24 @@ const LoginForm = () => {
               className="w-full px-4 py-3 border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 text-base"
             />
           </div>
-          <div>
+          <div className="relative">
             <label htmlFor="password" className="block text-base font-medium text-gray-700 mb-1">Password</label>
             <input
               id="password"
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               placeholder="Enter your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-4 py-3 border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 text-base"
+              className="w-full px-4 py-3 border border-gray-200 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-200 text-base pr-10"
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute inset-y-0 right-0 top-7 pr-3 flex items-center text-sm leading-5"
+            >
+              <Eye className="h-5 w-5 text-gray-400" />
+            </button>
           </div>
           <div className="text-right">
             <a 
