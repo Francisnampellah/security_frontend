@@ -52,6 +52,44 @@ export function Home() {
         </div>
       </section>
 
+      {/* How It Works Section */}
+      <section className="py-12 px-4 bg-white">
+        <h3 className="text-2xl md:text-3xl font-bold text-center mb-8 text-gray-900">
+          How It Works
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+          <div className="flex flex-col items-center text-center">
+            <div className="bg-blue-100 rounded-full p-4 mb-3">
+              <Lock className="text-blue-500 w-8 h-8" />
+            </div>
+            <h4 className="font-semibold text-lg mb-1">1. Sign Up & Log In</h4>
+            <p className="text-gray-500 text-sm">Create your free account to get started.</p>
+          </div>
+          <div className="flex flex-col items-center text-center">
+            <div className="bg-blue-100 rounded-full p-4 mb-3">
+              <Zap className="text-blue-500 w-8 h-8" />
+            </div>
+            <h4 className="font-semibold text-lg mb-1">2. Scan Your Network</h4>
+            <p className="text-gray-500 text-sm">Start a scan with one click. No technical skills needed.</p>
+          </div>
+          <div className="flex flex-col items-center text-center">
+            <div className="bg-blue-100 rounded-full p-4 mb-3">
+              <BarChart3 className="text-blue-500 w-8 h-8" />
+            </div>
+            <h4 className="font-semibold text-lg mb-1">3. View Results & Get Advice</h4>
+            <p className="text-gray-500 text-sm">See easy-to-understand results and follow our tips to improve your security.</p>
+          </div>
+        </div>
+        <div className="text-center mt-8">
+          <button
+            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-6 py-2 rounded-md shadow"
+            onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })}
+          >
+            Get Started Now
+          </button>
+        </div>
+      </section>
+
       {/* Features Section */}
       <section className="py-16 px-4 bg-white">
         <h3 className="text-2xl md:text-3xl font-bold text-center mb-10 text-gray-900">
